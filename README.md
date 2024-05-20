@@ -1,8 +1,13 @@
-# React + Vite
+# Papeleria Unibros
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Realizar un sistema de gestion de administraciones de una papeleria llamada Unibros.
 
-Currently, two official plugins are available:
+Las especificaciones se pueden encontrar en los entregables.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Las historias de usuarios estan en el documento ERS
+
+ERS: https://docs.google.com/document/d/1GhN2T4ynUqDRdH4UN4wDNfJbc1ZxiRRGJgdhQKyG26U/edit?usp=sharing
+
+En el BRIEF se pueden encontrar las funcionalidades importantes del programa pero sin especificaciones y detalles como en el ERS
+
+BRIEF: https://docs.google.com/document/d/1mcB76-n1cLYLcHFfrGHLATZ6D24iCbSqOfNe3VfWFoE/edit?usp=sharing
