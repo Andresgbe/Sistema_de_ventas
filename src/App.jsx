@@ -17,7 +17,6 @@ const App = () => {
 
   return (
     <Router>
-      {isAuthenticated && <div>aaaaaaaaaaa</div>}
       <div className="App">
         <Route exact path="/">
           {isAuthenticated ? (
