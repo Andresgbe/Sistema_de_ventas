@@ -5,7 +5,7 @@ import Home from "./pages/Home.jsx";
 import "./App.css";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const handleLogin = ({ email, password }) => {
     if (email === "admin@admin.com" && password === "123") {
@@ -17,6 +17,7 @@ const App = () => {
 
   return (
     <Router>
+      {isAuthenticated && <div>aaaaaaaaaaa</div>}
       <div className="App">
         <Route exact path="/">
           {isAuthenticated ? (
