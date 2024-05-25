@@ -17,8 +17,8 @@ function Copyright() {
   return (
     <Typography variant="body2" color="textSecondary" align="center">
       {"Copyright © "}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
+      <Link color="inherit" href="google.com">
+        Unibros
       </Link>{" "}
       {new Date().getFullYear()}
       {"."}
@@ -71,7 +71,7 @@ const SignIn = ({ onLogin }) => {
           <LockOutlinedIcon />
         </Avatar>
         <Typography component="h1" variant="h5">
-          Sign in
+          Iniciar Sesión
         </Typography>
         <form className={classes.form} noValidate>
           <TextField
@@ -80,7 +80,7 @@ const SignIn = ({ onLogin }) => {
             required
             fullWidth
             id="email"
-            label="Email Address"
+            label="Correo electrónico"
             name="email"
             autoComplete="email"
             autoFocus
@@ -92,7 +92,7 @@ const SignIn = ({ onLogin }) => {
             required
             fullWidth
             name="password"
-            label="Password"
+            label="Contraseña"
             type="password"
             id="password"
             autoComplete="current-password"
@@ -100,7 +100,7 @@ const SignIn = ({ onLogin }) => {
           />
           <FormControlLabel
             control={<Checkbox value="remember" color="primary" />}
-            label="Remember me"
+            label="Recordarme"
           />
           <Button
             fullWidth
@@ -109,17 +109,17 @@ const SignIn = ({ onLogin }) => {
             className={classes.submit}
             onClick={handleLogin}
           >
-            Sign In
+            Iniciar sesión
           </Button>
           <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">
-                Forgot password?
+                Olvidaste tu contraseña?
               </Link>
             </Grid>
             <Grid item>
               <Link href="#" variant="body2">
-                {"Don't have an account? Sign Up"}
+                {"No posees cuenta? Regístrate"}
               </Link>
             </Grid>
           </Grid>
