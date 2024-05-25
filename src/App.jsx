@@ -5,7 +5,7 @@ import Home from "./pages/Home.jsx";
 import "./App.css";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = ({ email, password }) => {
     if (email === "admin@admin.com" && password === "123") {
