@@ -99,7 +99,7 @@ export default function Dashboard({ children }) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Papeleria Unibros
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
