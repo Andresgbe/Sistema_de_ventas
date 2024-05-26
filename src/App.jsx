@@ -3,9 +3,10 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import SignIn from "./pages/SignIn";
 import Home from "./pages/Home.jsx";
 import "./App.css";
+import Products from "./pages/Products.jsx";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const handleLogin = ({ email, password }) => {
     if (email === "admin@admin.com" && password === "123") {
@@ -17,18 +18,19 @@ const App = () => {
 
   return (
     <Router>
-      <div className="App">
-        <Route exact path="/">
-          {isAuthenticated ? (
-            <Redirect to="/home" />
-          ) : (
-            <SignIn onLogin={handleLogin} />
-          )}
-        </Route>
-        <Route path="/home">
-          {isAuthenticated ? <Home /> : <Redirect to="/" />}
-        </Route>
-      </div>
+      <Route exact path="/">
+        {isAuthenticated ? (
+          <Redirect to="/home" />
+        ) : (
+          <SignIn onLogin={handleLogin} />
+        )}
+      </Route>
+      <Route path="/home">
+        {isAuthenticated ? <Home /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/products">
+        {isAuthenticated ? <Products /> : <Redirect to="/" />}
+      </Route>
     </Router>
   );
 };

@@ -138,6 +138,7 @@ export default function Dashboard({ children }) {
             flexGrow: 1,
             height: "100vh",
             overflow: "auto",
+            width: `${open ? "87vw" : "96vw"}`,
           }}
         >
           <Toolbar />

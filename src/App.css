@@ -1,15 +1,16 @@
-/*.App {
+.App {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
-*/
+
 
 #div {
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100vw;
 }
 
 .router {
