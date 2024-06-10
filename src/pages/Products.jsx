@@ -7,16 +7,16 @@ import ProductsTable from "../components/ProductsTable";
 import Dashboard from "../components/Dashboard";
 
 const CreateProductForm = ({ onCreate }) => {
+  const [code, setCode] = useState("");
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onCreate({ name, description, price, quantity });
+    onCreate({ code, name, price, quantity });
+    setCode("");
     setName("");
-    setDescription("");
     setPrice("");
     setQuantity("");
   };
@@ -26,17 +26,17 @@ const CreateProductForm = ({ onCreate }) => {
       <Grid container spacing={2}>
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            label="Código"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Descripción"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            label="Nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             fullWidth
           />
         </Grid>

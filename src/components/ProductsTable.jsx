@@ -13,24 +13,24 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
 // Función para generar datos de productos
-function createProduct(id, name, description, price, quantity) {
-  return { id, name, description, price, quantity };
+function createProduct(id, code, name, price, quantity) {
+  return { id, code, name, price, quantity };
 }
 
 // Datos de ejemplo de productos
 const products = [
-  createProduct(0, "Producto 1", "Descripción del producto 1", 10.99, 50),
-  createProduct(1, "Producto 2", "Descripción del producto 2", 19.99, 30),
-  createProduct(2, "Producto 3", "Descripción del producto 3", 5.99, 100),
-  createProduct(3, "Producto 4", "Descripción del producto 4", 15.99, 20),
-  createProduct(4, "Producto 5", "Descripción del producto 5", 12.99, 75),
+  createProduct(0, "ABC", "Producto 1", 10.99, 50),
+  createProduct(1, "BCD", "Producto 2", 19.99, 30),
+  createProduct(2, "CDE", "Producto 3", 5.99, 100),
+  createProduct(3, "DEF", "Producto 4", 15.99, 20),
+  createProduct(4, "EFG", "Producto 5", 12.99, 75),
 ];
 
 export default function ProductTable() {
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [editForm, setEditForm] = React.useState({
     name: "",
-    description: "",
+    code: "",
     price: "",
     quantity: "",
   });
@@ -40,8 +40,8 @@ export default function ProductTable() {
   const handleEdit = (product) => {
     setSelectedProduct(product);
     setEditForm({
+      code: product.code,
       name: product.name,
-      description: product.descripcion,
       price: product.precio,
       quantity: product.cantidad,
     });
@@ -79,8 +79,8 @@ export default function ProductTable() {
         <TableHead>
           <TableRow>
             <TableCell>ID</TableCell>
+            <TableCell>Code</TableCell>
             <TableCell>Nombre</TableCell>
-            <TableCell>Descripción</TableCell>
             <TableCell>Precio</TableCell>
             <TableCell>Cantidad</TableCell>
             <TableCell>Acciones</TableCell> {/* Nueva columna para acciones */}
@@ -90,8 +90,8 @@ export default function ProductTable() {
           {products.map((product) => (
             <TableRow key={product.id}>
               <TableCell>{product.id}</TableCell>
+              <TableCell>{product.code}</TableCell>
               <TableCell>{product.name}</TableCell>
-              <TableCell>{product.description}</TableCell>
               <TableCell>{product.price}</TableCell>
               <TableCell>{product.quantity}</TableCell>
               <TableCell>
@@ -169,10 +169,10 @@ export default function ProductTable() {
                 sx={{ mb: 2 }}
               />
               <TextField
-                label="Descripción"
-                value={editForm.description}
+                label="Código"
+                value={editForm.code}
                 onChange={(e) =>
-                  setEditForm({ ...editForm, description: e.target.value })
+                  setEditForm({ ...editForm, code: e.target.value })
                 }
                 fullWidth
                 sx={{ mb: 2 }}
