@@ -5,6 +5,7 @@ import Home from "./pages/Home.jsx";
 import "./App.css";
 import Products from "./pages/Products.jsx";
 import Providers from "./pages/Providers.jsx";
+import Ventas from "./pages/Ventas.jsx";
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -34,6 +35,9 @@ const App = () => {
       </Route>
       <Route path="/providers">
         {isAuthenticated ? <Providers /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/sells">
+        {isAuthenticated ? <Ventas /> : <Redirect to="/" />}
       </Route>
     </Router>
   );
