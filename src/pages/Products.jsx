@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
@@ -12,9 +12,38 @@ const CreateProductForm = ({ onCreate }) => {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validación de los campos del formulario
+    if (!code || !name || !price || !quantity) {
+      alert("Todos los campos son obligatorios.");
+      return;
+    }
+
     onCreate({ code, name, price, quantity });
+
+    // Enviar los datos al backend
+    try {
+      const response = await fetch("http://localhost:5000/api/productos", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ code, name, price, quantity }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al agregar el producto al backend");
+      }
+
+      const result = await response.json();
+      console.log(result.message); // Mensaje de éxito o confirmación
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
+    // Restablecer los campos del formulario
     setCode("");
     setName("");
     setPrice("");
@@ -71,9 +100,33 @@ const CreateProductForm = ({ onCreate }) => {
 const Products = () => {
   const [showForm, setShowForm] = useState(false);
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Función para cargar los productos desde el backend
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch("http://localhost:5000/api/productos");
+      if (!response.ok) {
+        throw new Error("Error al cargar los productos");
+      }
+      const data = await response.json();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error al obtener productos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // useEffect para cargar los productos cuando se monta el componente
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
   const handleCreateProduct = (newProduct) => {
-    setProducts([...products, newProduct]);
+    // Llamar a fetchProducts para obtener la lista actualizada desde el servidor
+    fetchProducts();
     setShowForm(false);
   };
 
@@ -102,7 +155,11 @@ const Products = () => {
           {/* Tabla de productos */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-              <ProductsTable products={products} />
+              {loading ? (
+                <div>Cargando productos...</div>
+              ) : (
+                <ProductsTable products={products} />
+              )}
             </Paper>
           </Grid>
         </Grid>

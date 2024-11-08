@@ -12,21 +12,7 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 
-// Función para generar datos de productos
-function createProduct(id, code, name, price, quantity) {
-  return { id, code, name, price, quantity };
-}
-
-// Datos de ejemplo de productos
-const products = [
-  createProduct(0, "ABC", "Producto 1", 10.99, 50),
-  createProduct(1, "BCD", "Producto 2", 19.99, 30),
-  createProduct(2, "CDE", "Producto 3", 5.99, 100),
-  createProduct(3, "DEF", "Producto 4", 15.99, 20),
-  createProduct(4, "EFG", "Producto 5", 12.99, 75),
-];
-
-export default function ProductTable() {
+export default function ProductsTable({ products }) {
   const [selectedProduct, setSelectedProduct] = React.useState(null);
   const [editForm, setEditForm] = React.useState({
     name: "",
@@ -42,8 +28,8 @@ export default function ProductTable() {
     setEditForm({
       code: product.code,
       name: product.name,
-      price: product.precio,
-      quantity: product.cantidad,
+      price: product.price,
+      quantity: product.quantity,
     });
     setOpenEditModal(true);
   };
@@ -83,7 +69,7 @@ export default function ProductTable() {
             <TableCell>Nombre</TableCell>
             <TableCell>Precio</TableCell>
             <TableCell>Cantidad</TableCell>
-            <TableCell>Acciones</TableCell> {/* Nueva columna para acciones */}
+            <TableCell>Acciones</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -207,7 +193,7 @@ export default function ProductTable() {
               </Button>
               <Button onClick={handleCloseEditModal} variant="outlined">
                 Cancelar
-              </Button>
+              </Button>ix the upstream dependency conflict, or retry
             </form>
           </React.Fragment>
         </Box>
