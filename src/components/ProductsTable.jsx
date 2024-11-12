@@ -8,7 +8,7 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ProductsTable = () => {
+const ProductsTable = ({ onEdit }) => { // AEGB: Añadido 'onEdit' como prop
   const [products, setProducts] = useState([]);
 
   // Función para cargar los productos desde el backend
@@ -25,26 +25,25 @@ const ProductsTable = () => {
     }
   };
 
- // Función para eliminar un producto
-const handleDeleteProduct = async (id) => {
-  try {
-    console.log(`Intentando eliminar el producto con ID: ${id}`); // NUEVO: Log para ver el ID antes de eliminar
-    const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
-      method: "DELETE",
-    });
+  // Función para eliminar un producto
+  const handleDeleteProduct = async (id) => {
+    try {
+      console.log(`Intentando eliminar el producto con ID: ${id}`); // NUEVO: Log para ver el ID antes de eliminar
+      const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
+        method: "DELETE",
+      });
 
-    if (!response.ok) {
-      throw new Error("Error al eliminar el producto");
+      if (!response.ok) {
+        throw new Error("Error al eliminar el producto");
+      }
+
+      // Actualizar la lista de productos después de la eliminación
+      setProducts(products.filter((product) => product.id !== id));
+      console.log(`Producto con ID: ${id} eliminado con éxito`);
+    } catch (error) {
+      console.error("Error al eliminar producto:", error);
     }
-
-    // Actualizar la lista de productos después de la eliminación
-    setProducts(products.filter((product) => product.id !== id));
-    console.log(`Producto con ID: ${id} eliminado con éxito`);
-  } catch (error) {
-    console.error("Error al eliminar producto:", error);
-  }
-};
-
+  };
 
   // useEffect para cargar los productos cuando se monta el componente
   useEffect(() => {
@@ -72,12 +71,15 @@ const handleDeleteProduct = async (id) => {
             <TableCell>{product.price}</TableCell>
             <TableCell>{product.quantity}</TableCell>
             <TableCell>
-              <IconButton aria-label="edit">
+              <IconButton
+                aria-label="edit"
+                onClick={() => onEdit(product)} // AEGB: Llamada a onEdit con el producto seleccionado
+              >
                 <EditIcon />
               </IconButton>
               <IconButton
                 aria-label="delete"
-                onClick={() => handleDeleteProduct(product.id)}  // NUEVA LÍNEA
+                onClick={() => handleDeleteProduct(product.id)} // Conservado sin cambios
               >
                 <DeleteIcon />
               </IconButton>
@@ -90,5 +92,6 @@ const handleDeleteProduct = async (id) => {
 };
 
 export default ProductsTable;
+
 
 

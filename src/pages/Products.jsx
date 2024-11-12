@@ -6,11 +6,20 @@ import TextField from "@mui/material/TextField";
 import ProductsTable from "../components/ProductsTable";
 import Dashboard from "../components/Dashboard";
 
-const CreateProductForm = ({ onCreate }) => {
+const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => { // AEGB: Agregamos editingProduct y onCancelEdit
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
+
+  useEffect(() => { // AEGB: Rellenar el formulario si editingProduct está definido
+    if (editingProduct) {
+      setCode(editingProduct.code);
+      setName(editingProduct.name);
+      setPrice(editingProduct.price);
+      setQuantity(editingProduct.quantity);
+    }
+  }, [editingProduct]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,26 +30,10 @@ const CreateProductForm = ({ onCreate }) => {
       return;
     }
 
-    onCreate({ code, name, price, quantity });
-
-    // Enviar los datos al backend
-    try {
-      const response = await fetch("http://localhost:5000/api/productos", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code, name, price, quantity }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al agregar el producto al backend");
-      }
-
-      const result = await response.json();
-      console.log(result.message); // Mensaje de éxito o confirmación
-    } catch (error) {
-      console.error("Error:", error);
+    if (editingProduct) { // AEGB: Si estamos editando un producto, ejecutamos onCreate con el ID
+      onCreate({ id: editingProduct.id, code, name, price, quantity });
+    } else {
+      onCreate({ code, name, price, quantity });
     }
 
     // Restablecer los campos del formulario
@@ -89,8 +82,18 @@ const CreateProductForm = ({ onCreate }) => {
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
-            Crear Producto
+            {editingProduct ? "Actualizar Producto" : "Crear Producto"} {/* AEGB */}
           </Button>
+          {editingProduct && ( // AEGB: Botón para cancelar la edición
+            <Button
+              type="button"
+              variant="text"
+              color="secondary"
+              onClick={onCancelEdit}
+            >
+              Cancelar
+            </Button>
+          )}
         </Grid>
       </Grid>
     </form>
@@ -101,8 +104,8 @@ const Products = () => {
   const [showForm, setShowForm] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [editingProduct, setEditingProduct] = useState(null); // AEGB: Estado para manejar edición
 
-  // Función para cargar los productos desde el backend
   const fetchProducts = async () => {
     try {
       setLoading(true);
@@ -119,66 +122,103 @@ const Products = () => {
     }
   };
 
-  // useEffect para cargar los productos cuando se monta el componente
   useEffect(() => {
     fetchProducts();
   }, []);
 
-  const handleCreateProduct = (newProduct) => {
-    // Llamar a fetchProducts para obtener la lista actualizada desde el servidor
-    fetchProducts();
+  const handleCreateProduct = async (newProduct) => {
+    if (newProduct.id) { // AEGB: Si el producto tiene un ID, actualizamos
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/productos/${newProduct.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newProduct),
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Error al actualizar el producto");
+        }
+
+        console.log("Producto actualizado exitosamente");
+        fetchProducts();
+        setEditingProduct(null); // AEGB
+      } catch (error) {
+        console.error("Error al actualizar producto:", error);
+      }
+    } else {
+      // Lógica existente para crear producto
+      try {
+        const response = await fetch("http://localhost:5000/api/productos", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newProduct),
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al agregar el producto al backend");
+        }
+
+        console.log("Producto creado exitosamente");
+        fetchProducts();
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    }
+
     setShowForm(false);
   };
 
-  // NUEVA LÍNEA - Función para eliminar un producto
-  const handleDeleteProduct = async (id) => {
-    try {
-      const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Error al eliminar el producto");
-      }
-
-      console.log(`Producto con ID ${id} eliminado exitosamente`); // NUEVA LÍNEA
-
-      // Actualizar la lista de productos
-      fetchProducts(); // NUEVA LÍNEA
-    } catch (error) {
-      console.error("Error al eliminar producto:", error); // NUEVA LÍNEA
-    }
+  const handleEditProduct = (product) => {
+    setEditingProduct(product); // AEGB
+    setShowForm(true);
   };
 
   return (
     <div>
       <Dashboard>
         <Grid container spacing={2}>
-          {/* Botón para mostrar/ocultar formulario */}
           <Grid item xs={12} sx={{ mb: 2 }}>
             <Button
               variant="contained"
               color="primary"
-              onClick={() => setShowForm(!showForm)}
+              onClick={() => {
+                setShowForm(!showForm);
+                setEditingProduct(null); // AEGB: Limpiar edición al abrir nuevo producto
+              }}
             >
               {showForm ? "Cancelar" : "Crear nuevo producto"}
             </Button>
           </Grid>
-          {/* Mostrar formulario si showForm es true */}
           {showForm && (
             <Grid item xs={12}>
               <Paper sx={{ p: 2 }}>
-                <CreateProductForm onCreate={handleCreateProduct} />
+                <CreateProductForm
+                  onCreate={handleCreateProduct}
+                  editingProduct={editingProduct} // AEGB
+                  onCancelEdit={() => {
+                    setEditingProduct(null); // AEGB
+                    setShowForm(false);
+                  }}
+                />
               </Paper>
             </Grid>
           )}
-          {/* Tabla de productos */}
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
               {loading ? (
                 <div>Cargando productos...</div>
               ) : (
-                <ProductsTable products={products} onDelete={handleDeleteProduct} /> // NUEVA LÍNEA
+                <ProductsTable
+                products={products}
+                onEdit={handleEditProduct} 
+              />
               )}
             </Paper>
           </Grid>
@@ -189,4 +229,5 @@ const Products = () => {
 };
 
 export default Products;
+
 
