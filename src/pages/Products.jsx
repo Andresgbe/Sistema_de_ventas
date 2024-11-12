@@ -130,6 +130,26 @@ const Products = () => {
     setShowForm(false);
   };
 
+  // NUEVA LÍNEA - Función para eliminar un producto
+  const handleDeleteProduct = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al eliminar el producto");
+      }
+
+      console.log(`Producto con ID ${id} eliminado exitosamente`); // NUEVA LÍNEA
+
+      // Actualizar la lista de productos
+      fetchProducts(); // NUEVA LÍNEA
+    } catch (error) {
+      console.error("Error al eliminar producto:", error); // NUEVA LÍNEA
+    }
+  };
+
   return (
     <div>
       <Dashboard>
@@ -158,7 +178,7 @@ const Products = () => {
               {loading ? (
                 <div>Cargando productos...</div>
               ) : (
-                <ProductsTable products={products} />
+                <ProductsTable products={products} onDelete={handleDeleteProduct} /> // NUEVA LÍNEA
               )}
             </Paper>
           </Grid>
@@ -169,3 +189,4 @@ const Products = () => {
 };
 
 export default Products;
+

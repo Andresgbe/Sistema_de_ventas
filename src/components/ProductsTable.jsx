@@ -25,6 +25,27 @@ const ProductsTable = () => {
     }
   };
 
+ // Función para eliminar un producto
+const handleDeleteProduct = async (id) => {
+  try {
+    console.log(`Intentando eliminar el producto con ID: ${id}`); // NUEVO: Log para ver el ID antes de eliminar
+    const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error("Error al eliminar el producto");
+    }
+
+    // Actualizar la lista de productos después de la eliminación
+    setProducts(products.filter((product) => product.id !== id));
+    console.log(`Producto con ID: ${id} eliminado con éxito`);
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+  }
+};
+
+
   // useEffect para cargar los productos cuando se monta el componente
   useEffect(() => {
     fetchProducts();
@@ -54,7 +75,10 @@ const ProductsTable = () => {
               <IconButton aria-label="edit">
                 <EditIcon />
               </IconButton>
-              <IconButton aria-label="delete">
+              <IconButton
+                aria-label="delete"
+                onClick={() => handleDeleteProduct(product.id)}  // NUEVA LÍNEA
+              >
                 <DeleteIcon />
               </IconButton>
             </TableCell>
@@ -66,3 +90,5 @@ const ProductsTable = () => {
 };
 
 export default ProductsTable;
+
+
