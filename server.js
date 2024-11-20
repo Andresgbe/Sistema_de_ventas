@@ -1,68 +1,87 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import cors from 'cors';  // Importar el middleware CORS
+import cors from 'cors';
+import pool from './dbConfig.js'; // Importa la conexión a PostgreSQL
 
-const app = express();
-
-// Utilizar CORS para permitir solicitudes desde otros orígenes
-app.use(cors());
-
-app.use(bodyParser.json());
-
-let productos = []; // Lista de productos
-
-// Obtener todos los productos
-app.get("/api/productos", (req, res) => {
-  res.json(productos);
-});
-
-// Agregar un nuevo producto
-app.post("/api/productos", (req, res) => {
-  const { code, name, price, quantity } = req.body;
-  const newProduct = { id: productos.length + 1, code, name, price, quantity };
-  productos.push(newProduct);
-  res.status(201).json({ message: "Producto agregado exitosamente", product: newProduct });
-});
-
-// Endpoint para eliminar un producto
-app.delete("/api/productos/:id", (req, res) => {
-  const { id } = req.params;
-  console.log(`Intentando eliminar producto con ID: ${id}`); // NUEVO: Log para ver el ID que llega
-
-  const productIndex = productos.findIndex((product) => product.id === parseInt(id));
-  
-  if (productIndex !== -1) {
-    productos.splice(productIndex, 1);
-    res.status(200).json({ message: "Producto eliminado exitosamente" });
+pool.query("SELECT NOW()", (err, res) => {
+  if (err) {
+    console.error("Error al conectar con la base de datos:", err);
   } else {
-    console.error(`Producto con ID: ${id} no encontrado`); // NUEVO: Log si el producto no es encontrado
-    res.status(404).json({ message: "Producto no encontrado" });
+    console.log("Conexión exitosa con PostgreSQL:", res.rows);
   }
 });
 
 
-// NUEVA LÍNEA - Endpoint para editar un producto existente
-app.put("/api/productos/:id", (req, res) => {  // NUEVA LÍNEA
-  const { id } = req.params;  // NUEVA LÍNEA
-  const { code, name, price, quantity } = req.body;  // NUEVA LÍNEA
-  const productIndex = productos.findIndex(product => product.id === parseInt(id));  // NUEVA LÍNEA
+const app = express();
 
-  if (productIndex !== -1) {  // NUEVA LÍNEA
-    // Actualizar los datos del producto  // NUEVA LÍNEA
-    productos[productIndex] = {  // NUEVA LÍNEA
-      id: productos[productIndex].id,  // NUEVA LÍNEA
-      code,  // NUEVA LÍNEA
-      name,  // NUEVA LÍNEA
-      price,  // NUEVA LÍNEA
-      quantity  // NUEVA LÍNEA
-    };  // NUEVA LÍNEA
-    res.json({ message: "Producto actualizado exitosamente", product: productos[productIndex] });  // NUEVA LÍNEA
-  } else {  // NUEVA LÍNEA
-    res.status(404).json({ message: "Producto no encontrado" });  // NUEVA LÍNEA
-  }  // NUEVA LÍNEA
-});  // NUEVA LÍNEA
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
 
-// Iniciar el servidor en el puerto 5000
+// Obtener todos los productos
+app.get("/api/productos", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM productos");
+    res.json(result.rows); // Devuelve los productos
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al obtener los productos" });
+  }
+});
+
+// Agregar un nuevo producto
+app.post("/api/productos", async (req, res) => {
+  const { code, name, price, quantity } = req.body; // Extrae los datos del cuerpo de la solicitud
+  try {
+    const result = await pool.query(
+      "INSERT INTO productos (code, name, price, quantity) VALUES ($1, $2, $3, $4) RETURNING *",
+      [code, name, price, quantity]
+    );
+    res.status(201).json({ message: "Producto agregado exitosamente", product: result.rows[0] });
+  } catch (err) {
+    console.error("Error al agregar el producto:", err);
+    res.status(500).json({ error: "Error al agregar el producto" });
+  }
+});
+
+
+// Editar un producto
+app.put("/api/productos/:id", async (req, res) => {
+  const { id } = req.params;
+  const { code, name, price, quantity } = req.body;
+  try {
+    const result = await pool.query(
+      "UPDATE productos SET code = $1, name = $2, price = $3, quantity = $4 WHERE id = $5 RETURNING *",
+      [code, name, price, quantity, id]
+    );
+    if (result.rowCount > 0) {
+      res.json({ message: "Producto actualizado exitosamente", product: result.rows[0] });
+    } else {
+      res.status(404).json({ message: "Producto no encontrado" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al actualizar el producto" });
+  }
+});
+
+// Eliminar un producto
+app.delete("/api/productos/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("DELETE FROM productos WHERE id = $1", [id]);
+    if (result.rowCount > 0) {
+      res.status(200).json({ message: "Producto eliminado exitosamente" });
+    } else {
+      res.status(404).json({ message: "Producto no encontrado" });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al eliminar el producto" });
+  }
+});
+
+// Iniciar el servidor
 app.listen(5000, () => {
   console.log("Servidor corriendo en http://localhost:5000");
 });
