@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -16,6 +16,8 @@ import TextField from "@mui/material/TextField";
 function createProvider(id, name, phone, address, mail) {
   return { id, name, phone, address, mail };
 }
+
+
 
 // Datos de ejemplo de proveedores
 const providers = [
