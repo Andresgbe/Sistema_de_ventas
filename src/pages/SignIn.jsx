@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { styled } from "@mui/material/styles";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -14,6 +13,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 
+// Estilos personalizados
 const useStyles = makeStyles((theme) => ({
   paper: {
     marginTop: theme.spacing(8),
@@ -26,7 +26,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(1),
   },
   submit: {
@@ -34,21 +34,43 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const SignIn = ({ onLogin }) => {
-  const classes = useStyles();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+const SignIn = () => {
+  const classes = useStyles(); // Inicializar `classes`
+  const [correo, setCorreo] = useState(""); 
+  const [contraseña, setContraseña] = useState(""); 
+  const [error, setError] = useState(""); 
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
+  // Manejadores de cambio de input
+  const handleEmailChange = (e) => setCorreo(e.target.value);
+  const handlePasswordChange = (e) => setContraseña(e.target.value);
 
-  const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
+  // Función para manejar el inicio de sesión
+  const handleLogin = async (e) => {
+    e.preventDefault();
 
-  const handleLogin = () => {
-    onLogin({ email, password });
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, contraseña }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Credenciales incorrectas");
+        return;
+      }
+
+      // Guardar el token en localStorage
+      localStorage.setItem("token", data.token);
+
+      alert("Inicio de sesión exitoso");
+      // redirigir a otra página o actualizar estado global
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err);
+      setError("Hubo un problema al iniciar sesión");
+    }
   };
 
   return (
@@ -96,6 +118,11 @@ const SignIn = ({ onLogin }) => {
               control={<Checkbox value="remember" color="primary" />}
               label="Recordarme"
             />
+            {error && (
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+            )}
             <Button
               fullWidth
               variant="contained"

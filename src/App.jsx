@@ -9,7 +9,7 @@ import Ventas from "./pages/Ventas.jsx";
 import Compras from "./pages/Compras.jsx";
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = ({ email, password }) => {
     if (email === "admin@admin.com" && password === "123") {

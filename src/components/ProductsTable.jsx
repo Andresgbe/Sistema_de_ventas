@@ -8,10 +8,10 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-const ProductsTable = ({ onEdit }) => { // AEGB: Añadido 'onEdit' como prop
+const ProductsTable = ({ onEdit }) => { 
   const [products, setProducts] = useState([]);
 
-  // Función para cargar los productos desde el backend
+  //cargar los productos desde el backend
   const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/productos");
@@ -23,7 +23,7 @@ const ProductsTable = ({ onEdit }) => { // AEGB: Añadido 'onEdit' como prop
     } catch (error) {
       console.error("Error al obtener productos:", error);
     }
-  };
+  }; 
 
   // Función para eliminar un producto
   const handleDeleteProduct = async (id) => {
@@ -45,7 +45,7 @@ const ProductsTable = ({ onEdit }) => { // AEGB: Añadido 'onEdit' como prop
     }
   };
 
-  // useEffect para cargar los productos cuando se monta el componente
+  //cargar los productos cuando se monta el componente
   useEffect(() => {
     fetchProducts();
   }, []);
