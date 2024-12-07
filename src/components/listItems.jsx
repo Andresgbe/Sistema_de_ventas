@@ -47,5 +47,10 @@ export const mainListItems = (
         <ListItemText primary="Compras" />
       </ListItemButton>
     </ButtonLink>
+    <ButtonLink href="/users">
+      <ListItemButton>
+        <ListItemText primary="Usuarios" />
+      </ListItemButton>
+    </ButtonLink>
   </React.Fragment>
 );

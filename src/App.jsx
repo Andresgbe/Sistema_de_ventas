@@ -7,8 +7,10 @@ import Products from "./pages/Products.jsx";
 import Providers from "./pages/Providers.jsx";
 import Ventas from "./pages/Ventas.jsx";
 import Compras from "./pages/Compras.jsx";
+import SignUp from "./pages/SignUp.jsx";
+
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const handleLogin = ({ email, password }) => {
     if (email === "admin@admin.com" && password === "123") {
@@ -41,6 +43,9 @@ const App = () => {
       </Route>
       <Route path="/purchases">
         {isAuthenticated ? <Compras /> : <Redirect to="/" />}
+      </Route>
+      <Route path="/users">
+        {isAuthenticated ? <SignUp /> : <Redirect to="/" />}
       </Route>
     </Router>
   );

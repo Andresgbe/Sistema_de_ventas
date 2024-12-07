@@ -1,7 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import Grid from "@mui/material/Grid";
+import Paper from "@mui/material/Paper";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dashboard from '../components/Dashboard';
+import UsersTable from '../components/UsersTable';
 
 
-const SignUp = () => {
+const CreateUserForm = ({ onCreate, editingProduct: editingUser, onCancelEdit }) => {
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [role, setRole] = useState("");
+}
+
+useEffect (() => {
+  if(editingProduct) {
+    setName(editingProduct.name);
+    setAddress(editingProduct.address);
+    setRole(editingProduct.role);
+  }
+}, [editingProduct]);
+
+const Users = () => {
   const [name, setName] = useState('');
   const [address, setAddress] = useState('');
   const [password, setPassword] = useState('');
@@ -9,6 +29,11 @@ const SignUp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!role) {
+      alert("Por favor, selecciona un rol válido");
+      return;
+    }
 
     console.log('Datos enviados:', { name, address, password, role }); 
 

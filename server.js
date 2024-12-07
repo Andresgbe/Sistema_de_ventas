@@ -32,7 +32,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   console.log('Datos recibidos:', { name, address, password, role });
   console.log(role);
-  console.log({ name, address, hashedPassword, role, roleId });
+  console.log({ name, address, role });
 
   
   try {

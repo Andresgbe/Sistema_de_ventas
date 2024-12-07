@@ -28,7 +28,7 @@ const ProductsTable = ({ onEdit }) => {
   // Función para eliminar un producto
   const handleDeleteProduct = async (id) => {
     try {
-      console.log(`Intentando eliminar el producto con ID: ${id}`); // NUEVO: Log para ver el ID antes de eliminar
+      console.log(`Intentando eliminar el producto con ID: ${id}`); 
       const response = await fetch(`http://localhost:5000/api/productos/${id}`, {
         method: "DELETE",
       });
