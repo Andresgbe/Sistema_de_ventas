@@ -6,13 +6,13 @@ import TextField from "@mui/material/TextField";
 import ProductsTable from "../components/ProductsTable";
 import Dashboard from "../components/Dashboard";
 
-const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => { // AEGB: Agregamos editingProduct y onCancelEdit
+const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  useEffect(() => { // AEGB: Rellenar el formulario si editingProduct está definido
+  useEffect(() => { 
     if (editingProduct) {
       setCode(editingProduct.code);
       setName(editingProduct.name);
@@ -30,7 +30,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => { // A
       return;
     }
 
-    if (editingProduct) { // AEGB: Si estamos editando un producto, ejecutamos onCreate con el ID
+    if (editingProduct) { 
       onCreate({ id: editingProduct.id, code, name, price, quantity });
     } else {
       onCreate({ code, name, price, quantity });
@@ -82,9 +82,9 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => { // A
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
-            {editingProduct ? "Actualizar Producto" : "Crear Producto"} {/* AEGB */}
+            {editingProduct ? "Actualizar Producto" : "Crear Producto"} 
           </Button>
-          {editingProduct && ( // AEGB: Botón para cancelar la edición
+          {editingProduct && ( 
             <Button
               type="button"
               variant="text"
@@ -104,7 +104,7 @@ const Products = () => {
   const [showForm, setShowForm] = useState(false);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [editingProduct, setEditingProduct] = useState(null); // AEGB: Estado para manejar edición
+  const [editingProduct, setEditingProduct] = useState(null);
 
   const fetchProducts = async () => {
     try {
@@ -127,7 +127,7 @@ const Products = () => {
   }, []);
 
   const handleCreateProduct = async (newProduct) => {
-    if (newProduct.id) { // AEGB: Si el producto tiene un ID, actualizamos
+    if (newProduct.id) {
       try {
         const response = await fetch(
           `http://localhost:5000/api/productos/${newProduct.id}`,
@@ -146,7 +146,7 @@ const Products = () => {
 
         console.log("Producto actualizado exitosamente");
         fetchProducts();
-        setEditingProduct(null); // AEGB
+        setEditingProduct(null);
       } catch (error) {
         console.error("Error al actualizar producto:", error);
       }
@@ -176,7 +176,7 @@ const Products = () => {
   };
 
   const handleEditProduct = (product) => {
-    setEditingProduct(product); // AEGB
+    setEditingProduct(product);
     setShowForm(true);
   };
 
@@ -190,7 +190,7 @@ const Products = () => {
               color="primary"
               onClick={() => {
                 setShowForm(!showForm);
-                setEditingProduct(null); // AEGB: Limpiar edición al abrir nuevo producto
+                setEditingProduct(null); 
               }}
             >
               {showForm ? "Cancelar" : "Crear nuevo producto"}
@@ -201,9 +201,9 @@ const Products = () => {
               <Paper sx={{ p: 2 }}>
                 <CreateProductForm
                   onCreate={handleCreateProduct}
-                  editingProduct={editingProduct} // AEGB
+                  editingProduct={editingProduct} 
                   onCancelEdit={() => {
-                    setEditingProduct(null); // AEGB
+                    setEditingProduct(null); 
                     setShowForm(false);
                   }}
                 />

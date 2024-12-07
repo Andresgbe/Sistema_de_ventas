@@ -20,18 +20,88 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- RUTAS PARA EL INICIO DE SESIÓN ---
+// -- RUTAS PARA REGISTRAR USUARIOS --
 
-import jwt from 'jsonwebtoken'; // AEGB: Para generar y verificar tokens JWT
-import bcrypt from 'bcrypt'; // AEGB: Para cifrar y verificar contraseñas
+
+app.post('/api/auth/register', async (req, res) => {
+  const { name, address, password, role } = req.body;
+
+  if (!name || !address || !password || !role) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  console.log('Datos recibidos:', { name, address, password, role });
+  console.log(role);
+  console.log({ name, address, hashedPassword, role, roleId });
+
+  
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const roleResult = await pool.query('SELECT id FROM roles WHERE name = $1', [role]);
+    if (roleResult.rows.length === 0) {
+      return res.status(400).json({ error: 'Rol inválido' });
+    }
+
+    const roleId = roleResult.rows[0].id;
+
+    await pool.query(
+      'INSERT INTO usuarios (name, address, password, role, role_id) VALUES ($1, $2, $3, $4, $5)',
+      [name, address, hashedPassword, role, roleId]
+    );
+    
+
+    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+  } catch (error) {
+    console.error('Error al registrar usuario:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+
+  console.log('Datos recibidos:', req.body);
+
+});
+
+
+const verifyRole = (requiredRole) => {
+  return async (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    if (!token) {
+      return res.status(403).json({ error: 'No autorizado' });
+    }
+
+    try {
+      const decoded = jwt.verify(token, 'secreto');
+      const userResult = await pool.query(
+        'SELECT r.name as role FROM usuarios u JOIN roles r ON u.role_id = r.id WHERE u.id = $1',
+        [decoded.userId]
+      );
+
+      if (userResult.rows[0]?.role !== requiredRole) {
+        return res.status(403).json({ error: 'Acceso denegado' });
+      }
+
+      next();
+    } catch (err) {
+      console.error('Error al verificar el role:', err);
+      res.status(500).json({ error: 'Error interno del servidor' });
+    }
+  };
+};
+
+app.get('/api/admin-only', verifyRole('admin'), (req, res) => {
+  res.json({ message: 'Solo para administradores' });
+});
+
+// --- RUTAS PARA EL INICIO DE SESIÓN ---
 
 // Ruta de inicio de sesión
 app.post('/api/auth/login', async (req, res) => {
-  const { correo, contraseña } = req.body;
+  const { address, password } = req.body;
 
   try {
     // Buscar por correo
-    const result = await pool.query('SELECT * FROM usuarios WHERE correo = $1', [correo]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE address = $1', [address]);
     const usuario = result.rows[0];
 
     if (!usuario) {
@@ -39,19 +109,19 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     // Verificar contraseña
-    const validPassword = await bcrypt.compare(contraseña, usuario.contraseña);
+    const validPassword = await bcrypt.compare(password, usuario.password);
     if (!validPassword) {
       return res.status(401).json({ error: 'Credenciales incorrectas' });
     }
 
     // Crear token JWT
     const token = jwt.sign(
-      { id: usuario.id, rol: usuario.rol },
+      { id: usuario.id, role: usuario.role },
       'SECRET_KEY', // clave segura
       { expiresIn: '1h' }
     );
 
-    res.json({ token, usuario: { id: usuario.id, nombre: usuario.nombre, rol: usuario.rol } });
+    res.json({ token, usuario: { id: usuario.id, name: usuario.name, role: usuario.role } });
   } catch (err) {
     console.error('Error al iniciar sesión:', err);
     res.status(500).json({ error: 'Error al iniciar sesión' });

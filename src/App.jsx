@@ -7,7 +7,6 @@ import Products from "./pages/Products.jsx";
 import Providers from "./pages/Providers.jsx";
 import Ventas from "./pages/Ventas.jsx";
 import Compras from "./pages/Compras.jsx";
-
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
@@ -48,4 +47,3 @@ const App = () => {
 };
 
 export default App;
-
