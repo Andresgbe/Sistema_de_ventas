@@ -73,7 +73,7 @@ const ProductsTable = ({ onEdit }) => {
             <TableCell>
               <IconButton
                 aria-label="edit"
-                onClick={() => onEdit(product)} // AEGB: Llamada a onEdit con el producto seleccionado
+                onClick={() => onEdit(product)} 
               >
                 <EditIcon />
               </IconButton>

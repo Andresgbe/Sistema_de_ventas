@@ -7,7 +7,8 @@ import Products from "./pages/Products.jsx";
 import Providers from "./pages/Providers.jsx";
 import Ventas from "./pages/Ventas.jsx";
 import Compras from "./pages/Compras.jsx";
-import SignUp from "./pages/SignUp.jsx";
+import Users from "./pages/Users.jsx";
+
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -45,7 +46,7 @@ const App = () => {
         {isAuthenticated ? <Compras /> : <Redirect to="/" />}
       </Route>
       <Route path="/users">
-        {isAuthenticated ? <SignUp /> : <Redirect to="/" />}
+        {isAuthenticated ? <Users /> : <Redirect to="/" />}
       </Route>
     </Router>
   );

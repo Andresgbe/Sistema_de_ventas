@@ -8,69 +8,66 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 
-
 const UsersTable = ({ onEdit }) => {
-    const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]);
 
-// Cargar usuarios
-const fetchUsers = async () => {
+  // Cargar usuarios desde el backend
+  const fetchUsers = async () => {
     try {
-        const response = await fetch("http://localhost:5000/api/auth/register");
-        if(!response.ok) {
-            throw new Error("Error al cargar los productos");
-        }
-        const data = await response.json();
-        setUsers(data);
-        
+      const response = await fetch("http://localhost:5000/api/users");
+      if (!response.ok) {
+        throw new Error("Error al cargar los usuarios");
+      }
+      const data = await response.json();
+      setUsers(data);
     } catch (error) {
-        console.error("Error al obtener productos:", error);
+      console.error("Error al obtener usuarios:", error);
     }
-};
+  };
 
-// Eliminar un usuario
-const handleDeleteUser = async(id) => {
-    try{
-        console.log(`Intentando eliminar usuario con ID ${id}`);
-        const response = await fetch(`http://localhost:5000/api/auth/register/${id}`, {
+  // Función para eliminar un usuario
+  const handleDeleteUser = async (id) => {
+    try {
+      console.log(`Intentando eliminar el usuario con ID: ${id}`);
+      const response = await fetch(`http://localhost:5000/api/users/${id}`, {
         method: "DELETE",
       });
 
-      if(!response.ok) {
-        throw new Error("Error al eliminar un usuario");
+      if (!response.ok) {
+        throw new Error("Error al eliminar el usuario");
       }
 
-      //Actualizar la lista después de eliminar el usuario
-      setUsers(users.filter((users) => users.id !== id));
+      // Actualizar la lista de usuarios después de la eliminación
+      setUsers(users.filter((user) => user.id !== id));
       console.log(`Usuario con ID: ${id} eliminado con éxito`);
-    } catch(error){
-        console.log("Error al eliminar un usuario:", error);
-
+    } catch (error) {
+      console.error("Error al eliminar usuario:", error);
     }
-};
+  };
 
-//cargar usuarios cuando al montarse el componente
-useEffect(() => {
+  // Cargar los usuarios cuando se monta el componente
+  useEffect(() => {
     fetchUsers();
-}, []);
+  }, []);
 
-return(
+  return (
     <Table>
-        <TableHead>
-            <TableRow>
-                <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Correo</TableCell>
-                <TableCell>ROL</TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
+      <TableHead>
+        <TableRow>
+          <TableCell>ID</TableCell>
+          <TableCell>Nombre</TableCell>
+          <TableCell>Correo</TableCell>
+          <TableCell>Rol</TableCell>
+          <TableCell>Acciones</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
             <TableCell>{user.id}</TableCell>
-            <TableCell>{user.code}</TableCell>
             <TableCell>{user.name}</TableCell>
-            <TableCell>{user.price}</TableCell>
-            <TableCell>{user.quantity}</TableCell>
+            <TableCell>{user.address}</TableCell>
+            <TableCell>{user.role}</TableCell>
             <TableCell>
               <IconButton
                 aria-label="edit"
@@ -80,7 +77,7 @@ return(
               </IconButton>
               <IconButton
                 aria-label="delete"
-                onClick={() => handleDeleteUser(user.id)} // Conservado sin cambios
+                onClick={() => handleDeleteUser(user.id)} // Llamada a la función de eliminar
               >
                 <DeleteIcon />
               </IconButton>
@@ -89,11 +86,11 @@ return(
         ))}
       </TableBody>
     </Table>
-
-)
+  );
 };
 
 export default UsersTable;
+
 
 
 
