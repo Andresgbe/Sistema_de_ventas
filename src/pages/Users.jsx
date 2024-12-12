@@ -11,6 +11,8 @@ const CreateUserForm = ({ onCreate, editingUser, onCancelEdit }) => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [role, setRole] = useState("");
+  const [password, setPassword] = useState('');
+
 
   useEffect(() => {
     if (editingUser) {
@@ -22,22 +24,28 @@ const CreateUserForm = ({ onCreate, editingUser, onCancelEdit }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!name || !address || !role) {
+  
+    // Validación de campos obligatorios
+    if (!name || !address || !role || !password) {
       alert("Todos los campos son obligatorios.");
       return;
     }
-
+  
     if (editingUser) {
-      onCreate({ id: editingUser.id, name, address, role });
+      // Si se está editando un usuario
+      onCreate({ id: editingUser.id, name, password, address, role });
     } else {
-      onCreate({ name, address, role });
+      // Si se está creando un nuevo usuario
+      onCreate({ name, address, password, role });
     }
-
-    setName("");
-    setAddress("");
-    setRole("");
+  
+    // Restablecer campos del formulario
+    setName('');
+    setAddress('');
+    setRole('');
+    setPassword(''); // Asegúrate de llamar a setPassword aquí
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>
@@ -65,6 +73,16 @@ const CreateUserForm = ({ onCreate, editingUser, onCancelEdit }) => {
           onChange={(e) => setRole(e.target.value)}
           fullWidth
         />
+      <Grid item xs={12}>
+        <TextField
+        label="Contraseña"
+        type="password"
+        value={password}
+       onChange={(e) => setPassword(e.target.value)}
+       fullWidth
+  />
+</Grid>
+
       </Grid>
       <Grid item xs={12}>
         <Button type="submit" variant="contained" color="primary">
@@ -107,13 +125,15 @@ const Users = () => {
       setLoading(false);
     }
   };
-
+  
+  
   useEffect(() => {
     fetchUsers();
   }, []);
 
   const handleCreateUser = async (newUser) => {
     if (newUser.id) {
+      // Actualización de usuario existente
       try {
         const response = await fetch(
           `http://localhost:5000/api/users/${newUser.id}`,
@@ -125,11 +145,11 @@ const Users = () => {
             body: JSON.stringify(newUser),
           }
         );
-
+  
         if (!response.ok) {
           throw new Error("Error al actualizar el usuario");
         }
-
+  
         console.log("Usuario actualizado exitosamente");
         fetchUsers();
         setEditingUser(null);
@@ -137,28 +157,31 @@ const Users = () => {
         console.error("Error al actualizar usuario:", error);
       }
     } else {
+      // Creación de nuevo usuario
       try {
         const response = await fetch("http://localhost:5000/api/users", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(newUser),
+          body: JSON.stringify(newUser), // Asegúrate de incluir role_id si es necesario
         });
-
+  
         if (!response.ok) {
           throw new Error("Error al agregar el usuario al backend");
         }
-
+  
         console.log("Usuario creado exitosamente");
         fetchUsers();
       } catch (error) {
-        console.error("Error:", error);
+        console.error("Error al agregar usuario:", error);
       }
     }
-
+  
     setShowForm(false);
   };
+  
+  
 
   const handleEditUser = (user) => {
     setEditingUser(user);

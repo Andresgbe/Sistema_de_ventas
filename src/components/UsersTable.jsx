@@ -24,6 +24,7 @@ const UsersTable = ({ onEdit }) => {
       console.error("Error al obtener usuarios:", error);
     }
   };
+  
 
   // Función para eliminar un usuario
   const handleDeleteUser = async (id) => {
@@ -90,6 +91,8 @@ const UsersTable = ({ onEdit }) => {
 };
 
 export default UsersTable;
+
+
 
 
 

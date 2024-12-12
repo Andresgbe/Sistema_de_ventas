@@ -13,28 +13,51 @@ pool.query("SELECT NOW()", (err, res) => {
   }
 });
 
-
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
 
-// -- RUTAS PARA REGISTRAR USUARIOS --
+// --- RUTAS PARA USUARIOS ---
+
+// Obtener todos los usuarios
+app.get('/api/users', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM usuarios');
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error al obtener los usuarios:', err);
+    res.status(500).json({ error: 'Error al obtener los usuarios' });
+  }
+});
 
 
-app.post('/api/auth/register', async (req, res) => {
+// Eliminar un usuario
+app.delete('/api/users/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [id]);
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    res.json({ message: 'Usuario eliminado exitosamente' });
+  } catch (err) {
+    console.error('Error al eliminar el usuario:', err);
+    res.status(500).json({ error: 'Error al eliminar el usuario' });
+  }
+});
+
+
+// Registrar un usuario
+// Ruta para agregar usuarios
+app.post('/api/users', async (req, res) => {
   const { name, address, password, role } = req.body;
 
   if (!name || !address || !password || !role) {
     return res.status(400).json({ error: 'Todos los campos son obligatorios' });
   }
 
-  console.log('Datos recibidos:', { name, address, password, role });
-  console.log(role);
-  console.log({ name, address, role });
-
-  
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -49,16 +72,12 @@ app.post('/api/auth/register', async (req, res) => {
       'INSERT INTO usuarios (name, address, password, role, role_id) VALUES ($1, $2, $3, $4, $5)',
       [name, address, hashedPassword, role, roleId]
     );
-    
 
     res.status(201).json({ message: 'Usuario registrado exitosamente' });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
-
-  console.log('Datos recibidos:', req.body);
-
 });
 
 
