@@ -12,7 +12,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
   const [price, setPrice] = useState("");
   const [quantity, setQuantity] = useState("");
 
-  useEffect(() => { 
+  useEffect(() => {
     if (editingProduct) {
       setCode(editingProduct.code);
       setName(editingProduct.name);
@@ -30,7 +30,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
       return;
     }
 
-    if (editingProduct) { 
+    if (editingProduct) {
       onCreate({ id: editingProduct.id, code, name, price, quantity });
     } else {
       onCreate({ code, name, price, quantity });
@@ -82,18 +82,19 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
-            {editingProduct ? "Actualizar Producto" : "Crear Producto"} 
+            {editingProduct ? "Actualizar Producto" : "Crear Producto"}
           </Button>
-          {editingProduct && ( 
-            <Button
-              type="button"
-              variant="text"
-              color="secondary"
-              onClick={onCancelEdit}
-            >
-              Cancelar
-            </Button>
-          )}
+
+          {/* Botón de "Cancelar" SIEMPRE visible cuando el formulario está abierto */}
+          <Button
+            type="button"
+            variant="text"
+            color="secondary"
+            onClick={onCancelEdit}
+            style={{ marginLeft: "10px" }} // Separación entre botones
+          >
+            Cancelar
+          </Button>
         </Grid>
       </Grid>
     </form>
@@ -127,7 +128,7 @@ const Products = () => {
   }, []);
 
   const handleCreateProduct = async (newProduct) => {
-    if (newProduct.id) {
+    if (newProduct.id) { //Actualización del producto
       try {
         const response = await fetch(
           `http://localhost:5000/api/productos/${newProduct.id}`,
@@ -151,7 +152,7 @@ const Products = () => {
         console.error("Error al actualizar producto:", error);
       }
     } else {
-      // Lógica existente para crear producto
+      // Lógica para crear producto
       try {
         const response = await fetch("http://localhost:5000/api/productos", {
           method: "POST",
@@ -172,53 +173,56 @@ const Products = () => {
       }
     }
 
-    setShowForm(false);
+    setShowForm(false); // Cerrar form después de editar o crear un producto
   };
 
   const handleEditProduct = (product) => {
     setEditingProduct(product);
-    setShowForm(true);
+    setShowForm(true); //Mostrar form
   };
 
   return (
     <div>
       <Dashboard>
         <Grid container spacing={2}>
+          {/* Botón para crear un nuevo producto */}
           <Grid item xs={12} sx={{ mb: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingProduct(null); 
-              }}
-            >
-              {showForm ? "Cancelar" : "Crear nuevo producto"}
-            </Button>
+            {!showForm && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setShowForm(true); // Mostrar el formulario
+                  setEditingProduct(null); // Limpiar la edición anterior
+                }}
+              >
+                Crear nuevo producto
+              </Button>
+            )}
           </Grid>
+
+          {/* Mostrar formulario si showForm es true */}
           {showForm && (
             <Grid item xs={12}>
               <Paper sx={{ p: 2 }}>
                 <CreateProductForm
-                  onCreate={handleCreateProduct}
-                  editingProduct={editingProduct} 
+                  onCreate={handleCreateProduct} // Función para crear o editar producto
+                  editingProduct={editingProduct} // Producto que se edita (si existe)
                   onCancelEdit={() => {
-                    setEditingProduct(null); 
-                    setShowForm(false);
+                    setEditingProduct(null); // Limpiar el producto en edición
+                    setShowForm(false); // Ocultar el formulario
                   }}
                 />
               </Paper>
             </Grid>
           )}
+
           <Grid item xs={12}>
             <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
               {loading ? (
                 <div>Cargando productos...</div>
               ) : (
-                <ProductsTable
-                products={products}
-                onEdit={handleEditProduct} 
-              />
+                <ProductsTable products={products} onEdit={handleEditProduct} />
               )}
             </Paper>
           </Grid>

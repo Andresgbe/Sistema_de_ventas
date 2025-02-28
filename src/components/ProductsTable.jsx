@@ -11,7 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 const ProductsTable = ({ onEdit }) => { 
   const [products, setProducts] = useState([]);
 
-  //cargar los productos desde el backend
+  //cargar los productos desde el back
   const fetchProducts = async () => {
     try {
       const response = await fetch("http://localhost:5000/api/productos");
@@ -25,7 +25,7 @@ const ProductsTable = ({ onEdit }) => {
     }
   }; 
 
-  // Función para eliminar un producto
+  //eliminar un producto
   const handleDeleteProduct = async (id) => {
     try {
       console.log(`Intentando eliminar el producto con ID: ${id}`); 

@@ -4,6 +4,7 @@ import cors from 'cors';
 import pool from './dbConfig.js'; // Importa la conexión a PostgreSQL
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'; 
+// import { userSetter } from 'core-js/fn/symbol';
 
 pool.query("SELECT NOW()", (err, res) => {
   if (err) {
@@ -49,7 +50,6 @@ app.delete('/api/users/:id', async (req, res) => {
 });
 
 
-// Registrar un usuario
 // Ruta para agregar usuarios
 app.post('/api/users', async (req, res) => {
   const { name, address, password, role } = req.body;
@@ -73,7 +73,9 @@ app.post('/api/users', async (req, res) => {
       [name, address, hashedPassword, role, roleId]
     );
 
-    res.status(201).json({ message: 'Usuario registrado exitosamente' });
+    res.status(201).json({ 
+      message: 'Usuario registrado exitosamente'
+    });
   } catch (error) {
     console.error('Error al registrar usuario:', error);
     res.status(500).json({ error: 'Error interno del servidor' });

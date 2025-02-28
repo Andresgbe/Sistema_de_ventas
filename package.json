@@ -59,7 +59,7 @@
     "clean-css": "^4.1.11",
     "clipboard-copy": "^3.0.0",
     "clsx": "^1.0.4",
-    "core-js": "^2.6.11",
+    "core-js": "^3.40.0",
     "cors": "^2.8.5",
     "cross-env": "^7.0.0",
     "cross-fetch": "^3.0.4",

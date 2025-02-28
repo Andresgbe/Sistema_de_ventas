@@ -8,20 +8,42 @@ import Providers from "./pages/Providers.jsx";
 import Ventas from "./pages/Ventas.jsx";
 import Compras from "./pages/Compras.jsx";
 import Users from "./pages/Users.jsx";
+import { AuthProvider, useAuth } from "./components/AuthContext.jsx";
 
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
-  const handleLogin = ({ email, password }) => {
-    if (email === "admin@admin.com" && password === "123") {
-      setIsAuthenticated(true);
-    } else {
-      alert("Credenciales incorrectas");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ correo, contraseña }),
+      });
+  
+      const data = await response.json();
+  
+      if (!response.ok) {
+        setError(data.error || "Credenciales incorrectas");
+        return;
+      }
+  
+      // Actualizar el estado global
+      setIsAuthenticated(true); // Indicar que el usuario está autenticado
+      setUserRole(data.role); // Asignar el rol del usuario devuelto por el backend
+  
+      alert("Inicio de sesión exitoso");
+    } catch (err) {
+      console.error("Error al iniciar sesión:", err);
+      setError("Hubo un problema al iniciar sesión");
     }
   };
 
   return (
+    <AuthProvider>
     <Router>
       <Route exact path="/">
         {isAuthenticated ? (
@@ -49,6 +71,7 @@ const App = () => {
         {isAuthenticated ? <Users /> : <Redirect to="/" />}
       </Route>
     </Router>
+    </AuthProvider>
   );
 };
 
