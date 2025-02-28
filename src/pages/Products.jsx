@@ -85,11 +85,11 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
             {editingProduct ? "Actualizar Producto" : "Crear Producto"}
           </Button>
 
-          {/* Botón de "Cancelar" SIEMPRE visible cuando el formulario está abierto */}
+          {/*Botón de cancelar*/}
           <Button
             type="button"
             variant="text"
-            color="secondary"
+            color="primary"
             onClick={onCancelEdit}
             style={{ marginLeft: "10px" }} // Separación entre botones
           >

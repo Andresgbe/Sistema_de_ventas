@@ -49,59 +49,58 @@ const CreateUserForm = ({ onCreate, editingUser, onCancelEdit }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-    <Grid container spacing={2}>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          label="Nombre"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          fullWidth
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          label="Correo"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          fullWidth
-        />
-      </Grid>
-      <Grid item xs={12} sm={6}>
-        <TextField
-          label="Rol"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-          fullWidth
-        />
-      <Grid item xs={12}>
-        <TextField
-        label="Contraseña"
-        type="password"
-        value={password}
-       onChange={(e) => setPassword(e.target.value)}
-       fullWidth
-  />
-</Grid>
-
-      </Grid>
-      <Grid item xs={12}>
-        <Button type="submit" variant="contained" color="primary">
-          {editingUser ? "Actualizar Usuario" : "Crear Usuario"}
-        </Button>
-        {editingUser && (
+      <Grid container spacing={2}>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Nombre"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Correo"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Rol"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <TextField
+            label="Contraseña"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button type="submit" variant="contained" color="primary">
+            {editingUser ? "Actualizar Usuario" : "Crear Usuario"}
+          </Button>
+          {/*Botón de cancelar*/}
           <Button
             type="button"
             variant="text"
-            color="secondary"
+            color="primary"
             onClick={onCancelEdit}
+            style={{ marginLeft: "10px" }} // Separación entre botones
           >
             Cancelar
           </Button>
-        )}
+        </Grid>
       </Grid>
-    </Grid>
-  </form>
-);
+    </form>
+  );
 };
 
 const Users = () => {
@@ -192,18 +191,23 @@ const Users = () => {
     <div>
       <Dashboard>
         <Grid container spacing={2}>
+          {/* Botón para crear un nuevo producto */}
           <Grid item xs={12} sx={{ mb: 2 }}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                setShowForm(!showForm);
-                setEditingUser(null);
-              }}
-            >
-              {showForm ? "Cancelar" : "Crear nuevo usuario"}
-            </Button>
+            {!showForm && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setShowForm(!showForm);
+                  setEditingUser(null);
+                }}
+              >
+                Crear nuevo usuario
+              </Button>
+            )}
           </Grid>
+
+          {/* Mostrar formulario si showForm es true */}
           {showForm && (
             <Grid item xs={12}>
               <Paper sx={{ p: 2 }}>
