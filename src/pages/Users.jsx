@@ -74,7 +74,7 @@ const CreateUserForm = ({ onCreate, editingUser, onCancelEdit }) => {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={12} sm={6}>
           <TextField
             label="Contraseña"
             type="password"

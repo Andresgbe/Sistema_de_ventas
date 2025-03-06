@@ -59,6 +59,14 @@ const CreateProviderForm = ({ onCreate, onCancelEdit, editingProvider }) => {
             fullWidth
           />
         </Grid>
+        <Grid item xs={12} sm={6}>
+        <TextField 
+          label="Correo"
+          value={mail}
+          onChange={(e) => setMail(e.target.value)}
+          fullWidth
+        />
+        </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
             {editingProvider ? "Actualizar Proveedor" : "Crear Proveedor"}
@@ -107,27 +115,62 @@ const Providers = () => {
     fetchProviders();
   }, []);
 
-  const handleCreateProvider = async (newProvider) => {
+
+const handleCreateProvider = async (newProvider) => {
+  console.log("Recibido en handleCreateProvider:", newProvider);
+
+  if (newProvider.id) { // Actualización del proveedor
     try {
-      const response = await fetch("http://localhost:5000/api/proveedores", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newProvider),
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/proveedores/${newProvider.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newProvider),
+        }
+      );
 
       if (!response.ok) {
-        throw new Error("Error al agregar el proveedor");
+        throw new Error("Error al actualizar el proveedor");
       }
 
-      const data = await response.json();
-      setProviders([...providers, data.provider]); // Actualizar la lista con el nuevo proveedor
-      setShowForm(false);
+      console.log("Proveedor actualizado exitosamente");
+      fetchProviders();
+      setEditingProvider(null);
     } catch (error) {
-      console.error("Error al agregar el proveedor:", error);
+      console.error("Error al actualizar proveedor:", error);
     }
-  };
+  } else {
+    // Lógica para crear proveedor
+    try {
+    const response = await fetch("http://localhost:5000/api/proveedores", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        nombre: newProvider.name,
+        telefono: newProvider.phone,
+        direccion: newProvider.address,
+        correo: newProvider.mail,
+      }),
+    });
+      if (!response.ok) {
+        throw new Error("Error al agregar el proveedor al backend");
+      }
+
+      console.log("Proveedor creado exitosamente");
+      fetchProviders();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  setShowForm(false); // Cerrar formulario después de editar o crear un proveedor
+};
+
 
     const handleEditProvider = (provider) => {
       setEditingProvider(provider);

@@ -33,7 +33,6 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-
 // Eliminar un usuario
 app.delete('/api/users/:id', async (req, res) => {
   const { id } = req.params;
@@ -48,7 +47,6 @@ app.delete('/api/users/:id', async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar el usuario' });
   }
 });
-
 
 // Ruta para agregar usuarios
 app.post('/api/users', async (req, res) => {
@@ -81,7 +79,6 @@ app.post('/api/users', async (req, res) => {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 });
-
 
 const verifyRole = (requiredRole) => {
   return async (req, res, next) => {
@@ -149,8 +146,6 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-
-
 // --- RUTAS PARA PRODUCTOS ---
 
 // Obtener todos los productos
@@ -215,7 +210,6 @@ app.delete('/api/productos/:id', async (req, res) => {
   }
 });
 
-
 // --- RUTAS PARA PROVEEDORES ---
 
 // Obtener todos los proveedores
@@ -229,23 +223,27 @@ app.get("/api/proveedores", async (req, res) => {
   }
 });
 
-
 // Agregar un proveedor nuevo
 app.post("/api/proveedores", async (req, res) => {
-  const { name, phone, address, email } = req.body;
+  const { nombre, telefono, direccion, correo } = req.body;
   try {
     const result = await pool.query(
-      "INSERT INTO proveedores (name, phone, address, email) VALUES ($1, $2, $3, $4) RETURNING *",
-      [name, phone, address, email]
-    ); 
-    res.status(201).json({ message: "Proveedor agregado exitosamente", provider: result.rows[0] });
+      "INSERT INTO proveedores (nombre, telefono, direccion, correo) VALUES ($1, $2, $3, $4) RETURNING *",
+      [nombre, telefono, direccion, correo]
+    );
+    res
+      .status(201)
+      .json({
+        message: "Proveedor agregado exitosamente",
+        provider: result.rows[0],
+      });
   } catch (err) {
-    console.error("Error al agregar el proveedor", err);
-    res.status(500).json({ error: "Error al agregar el proveedor" });
+    console.error("Error al agregar el proveedor:", err);
+    res
+      .status(500)
+      .json({ error: "Error al agregar el proveedor", detalle: err.message });
   }
 });
-
-
   
 // Actualizar un proveedor
 app.put('/api/proveedores/:id', async (req, res) => {
