@@ -246,24 +246,34 @@ app.post("/api/proveedores", async (req, res) => {
 });
   
 // Actualizar un proveedor
-app.put('/api/proveedores/:id', async (req, res) => {
+app.put("/api/proveedores/:id", async (req, res) => {
   const { id } = req.params;
   const { nombre, telefono, direccion, correo } = req.body;
+
+  console.log(`Recibiendo actualización para ID: ${id}`);
+
   try {
     const result = await pool.query(
-      'UPDATE proveedores SET nombre = $1, telefono = $2, direccion = $3, correo = $4 WHERE id = $5 RETURNING *',
+      "UPDATE proveedores SET nombre = $1, telefono = $2, direccion = $3, correo = $4 WHERE id = $5 RETURNING *",
       [nombre, telefono, direccion, correo, id]
     );
+
     if (result.rowCount === 0) {
-      res.status(404).json({ error: 'Proveedor no encontrado' });
-    } else {
-      res.json({ message: 'Proveedor actualizado exitosamente', proveedor: result.rows[0] });
+      return res.status(404).json({ error: "Proveedor no encontrado" });
     }
+
+    res.json({ message: "Proveedor actualizado", provider: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al actualizar el proveedor' });
+    console.error("Error al actualizar el proveedor:", err);
+    res
+      .status(500)
+      .json({
+        error: "Error al actualizar el proveedor",
+        detalle: err.message,
+      });
   }
 });
+
 
 // Eliminar un proveedor
 app.delete('/api/proveedores/:id', async (req, res) => {

@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useEffect } from "react"; 
+import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
@@ -7,29 +6,47 @@ import TextField from "@mui/material/TextField";
 import ProvidersTable from "../components/ProvidersTable";
 import Dashboard from "../components/Dashboard";
 
-const CreateProviderForm = ({ onCreate, onCancelEdit, editingProvider }) => {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
-  const [mail, setMail] = useState("");
+const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
+  const [nombre, setNombre] = useState("");
+  const [telefono, setTelefono] = useState("");
+  const [direccion, setDireccion] = useState("");
+  const [correo, setCorreo] = useState("");
 
+  useEffect(() => {
+    if (editingProvider) {
+      setNombre(editingProvider.nombre);
+      setTelefono(editingProvider.telefono);
+      setDireccion(editingProvider.direccion);
+      setCorreo(editingProvider.correo);
+    }
+  }, [editingProvider]);
 
-    useEffect(() => {
-      if (editingProvider) {
-        setName(editingProvider.name);
-        setPhone(editingProvider.phone);
-        setAddress(editingProvider.address);
-        setMail(editingProvider.mail);
-      }
-    }, [editingProvider]);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onCreate({ name, phone, address, mail });
-    setName("");
-    setPhone("");
-    setAddress("");
-    setMail("");
+
+    // Validación de los campos del formulario
+    if (!nombre || !telefono || !direccion || !correo) {
+      alert("Todos los campos son obligatorios.");
+      return;
+    }
+
+    if (editingProvider) {
+      onCreate({
+        id: editingProvider.id,
+        nombre,
+        telefono,
+        direccion,
+        correo,
+      });
+    } else {
+      onCreate({ nombre, telefono, direccion, correo });
+    }
+
+    // Restablecer los campos del formulario
+    setNombre("");
+    setTelefono("");
+    setDireccion("");
+    setCorreo("");
   };
 
   return (
@@ -38,41 +55,41 @@ const CreateProviderForm = ({ onCreate, onCancelEdit, editingProvider }) => {
         <Grid item xs={12} sm={6}>
           <TextField
             label="Nombre"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             label="Teléfono"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            value={telefono}
+            onChange={(e) => setTelefono(e.target.value)}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
             label="Dirección"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
             fullWidth
           />
         </Grid>
         <Grid item xs={12} sm={6}>
-        <TextField 
-          label="Correo"
-          value={mail}
-          onChange={(e) => setMail(e.target.value)}
-          fullWidth
-        />
+          <TextField
+            label="Correo"
+            value={correo}
+            onChange={(e) => setCorreo(e.target.value)}
+            fullWidth
+          />
         </Grid>
         <Grid item xs={12}>
           <Button type="submit" variant="contained" color="primary">
             {editingProvider ? "Actualizar Proveedor" : "Crear Proveedor"}
           </Button>
 
-          {/*Botón de cancelar*/}
+          {/* Botón de cancelar */}
           <Button
             type="button"
             variant="text"
@@ -91,8 +108,8 @@ const CreateProviderForm = ({ onCreate, onCancelEdit, editingProvider }) => {
 const Providers = () => {
   const [showForm, setShowForm] = useState(false);
   const [providers, setProviders] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [editingProvider, setEditingProvider] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [editingProvider, setEditingProvider] = useState(null);
 
   const fetchProviders = async () => {
     try {
@@ -106,126 +123,123 @@ const Providers = () => {
     } catch (error) {
       console.error("Error al obtener proveedores:", error);
     } finally {
-      setLoading(false); // Se ejecuta SIEMPRE, incluso si hay error
+      setLoading(false);
     }
   };
-
 
   useEffect(() => {
     fetchProviders();
   }, []);
 
+  const handleCreateProvider = async (newProvider) => {
+    console.log("Datos recibidos en handleCreateProvider:", newProvider);
 
-const handleCreateProvider = async (newProvider) => {
-  console.log("Recibido en handleCreateProvider:", newProvider);
+    if (newProvider.id) {
+      // Actualizar proveedor existente
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/proveedores/${newProvider.id}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newProvider),
+          }
+        );
 
-  if (newProvider.id) { // Actualización del proveedor
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/proveedores/${newProvider.id}`,
-        {
-          method: "PUT",
+        if (!response.ok) {
+          throw new Error("Error al actualizar el proveedor");
+        }
+
+        console.log("Proveedor actualizado exitosamente");
+        fetchProviders();
+        setEditingProvider(null);
+      } catch (error) {
+        console.error("Error al actualizar proveedor:", error);
+      }
+    } else {
+      // Crear nuevo proveedor
+      try {
+        const response = await fetch("http://localhost:5000/api/proveedores", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(newProvider),
+        });
+
+        if (!response.ok) {
+          throw new Error("Error al agregar el proveedor al backend");
         }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al actualizar el proveedor");
+        console.log("Proveedor creado exitosamente");
+        fetchProviders();
+      } catch (error) {
+        console.error("Error:", error);
       }
-
-      console.log("Proveedor actualizado exitosamente");
-      fetchProviders();
-      setEditingProvider(null);
-    } catch (error) {
-      console.error("Error al actualizar proveedor:", error);
     }
-  } else {
-    // Lógica para crear proveedor
-    try {
-    const response = await fetch("http://localhost:5000/api/proveedores", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        nombre: newProvider.name,
-        telefono: newProvider.phone,
-        direccion: newProvider.address,
-        correo: newProvider.mail,
-      }),
-    });
-      if (!response.ok) {
-        throw new Error("Error al agregar el proveedor al backend");
-      }
 
-      console.log("Proveedor creado exitosamente");
-      fetchProviders();
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  }
+    setShowForm(false);
+  };
 
-  setShowForm(false); // Cerrar formulario después de editar o crear un proveedor
-};
+  const handleEditProvider = (provider) => {
+    setEditingProvider(provider);
+    setShowForm(true);
+  };
 
-
-    const handleEditProvider = (provider) => {
-      setEditingProvider(provider);
-      setShowForm(true); //Mostrar form
-    };
-
-return (
-  <div>
-    <Dashboard>
-      <Grid container spacing={2}>
-        {/* Botón para crear un nuevo proveedor */}
-        <Grid item xs={12} sx={{ mb: 2 }}>
-          {!showForm && (
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => {
-                setShowForm(true); // Mostrar el formulario
-                setEditingProvider(null); // Limpiar la edición anterior
-              }}
-            >
-              Crear nuevo proveedor
-            </Button>
-          )}
-        </Grid>
-
-        {/* Mostrar formulario si showForm es true */}
-        {showForm && (
-          <Grid item xs={12}>
-            <Paper sx={{ p: 2 }}>
-              <CreateProviderForm
-                onCreate={handleCreateProvider} // Función para crear o editar proveedor
-                editingProvider={editingProvider} // Proveedor que se edita (si existe)
-                onCancelEdit={() => {
-                  setEditingProvider(null); // Limpiar el proveedor en edición
-                  setShowForm(false); // Ocultar el formulario
+  return (
+    <div>
+      <Dashboard>
+        <Grid container spacing={2}>
+          {/* Botón para crear un nuevo proveedor */}
+          <Grid item xs={12} sx={{ mb: 2 }}>
+            {!showForm && (
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => {
+                  setShowForm(true); // Mostrar el formulario
+                  setEditingProvider(null); // Limpiar la edición anterior
                 }}
-              />
+              >
+                Crear nuevo proveedor
+              </Button>
+            )}
+          </Grid>
+
+          {/* Mostrar formulario si showForm es true */}
+          {showForm && (
+            <Grid item xs={12}>
+              <Paper sx={{ p: 2 }}>
+                <CreateProviderForm
+                  onCreate={handleCreateProvider} // Función para crear o editar proveedor
+                  editingProvider={editingProvider} // Proveedor en edición (si existe)
+                  onCancelEdit={() => {
+                    setEditingProvider(null); // Limpiar la edición
+                    setShowForm(false); // Ocultar el formulario
+                  }}
+                />
+              </Paper>
+            </Grid>
+          )}
+
+          <Grid item xs={12}>
+            <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
+              {loading ? (
+                <div>Cargando proveedores...</div>
+              ) : (
+                <ProvidersTable
+                  providers={providers}
+                  onEdit={handleEditProvider}
+                />
+              )}
             </Paper>
           </Grid>
-        )}
-
-        <Grid item xs={12}>
-          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-            {loading ? (
-              <div>Cargando proveedores...</div>
-            ) : (
-              <ProvidersTable providers={providers} onEdit={handleEditProvider} />
-            )}
-          </Paper>
         </Grid>
-      </Grid>
-    </Dashboard>
-  </div>
-);
+      </Dashboard>
+    </div>
+  );
 };
 
 export default Providers;
