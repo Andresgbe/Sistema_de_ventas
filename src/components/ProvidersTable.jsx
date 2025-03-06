@@ -66,10 +66,10 @@ const ProvidersTable = ({ onEdit }) => {
         {providers.map((provider) => (
           <TableRow key={provider.id}>
             <TableCell>{provider.id}</TableCell>
-            <TableCell>{provider.name}</TableCell>
-            <TableCell>{provider.phone}</TableCell>
-            <TableCell>{provider.address}</TableCell>
-            <TableCell>{provider.mail}</TableCell>
+            <TableCell>{provider.nombre}</TableCell>
+            <TableCell>{provider.telefono}</TableCell>
+            <TableCell>{provider.direccion}</TableCell>
+            <TableCell>{provider.correo}</TableCell>
             <TableCell>
               <IconButton
                 aria-label="edit"

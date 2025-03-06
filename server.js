@@ -219,31 +219,34 @@ app.delete('/api/productos/:id', async (req, res) => {
 // --- RUTAS PARA PROVEEDORES ---
 
 // Obtener todos los proveedores
-app.get('/api/proveedores', async (req, res) => {
+app.get("/api/proveedores", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM proveedores');
+    const result = await pool.query("SELECT * FROM proveedores");
     res.json(result.rows);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al obtener los proveedores' });
+    console.error("Error al obtener los proveedores", err);
+    res.status(500).json({ error: "Error al obtener los proveedores" });
   }
 });
+
 
 // Agregar un proveedor nuevo
-app.post('/api/proveedores', async (req, res) => {
-  const { nombre, telefono, direccion, correo } = req.body;
+app.post("/api/proveedores", async (req, res) => {
+  const { name, phone, address, email } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO proveedores (nombre, telefono, direccion, correo) VALUES ($1, $2, $3, $4) RETURNING *',
-      [nombre, telefono, direccion, correo]
-    );
-    res.status(201).json({ message: 'Proveedor agregado exitosamente', proveedor: result.rows[0] });
+      "INSERT INTO proveedores (name, phone, address, email) VALUES ($1, $2, $3, $4) RETURNING *",
+      [name, phone, address, email]
+    ); 
+    res.status(201).json({ message: "Proveedor agregado exitosamente", provider: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al agregar el proveedor' });
+    console.error("Error al agregar el proveedor", err);
+    res.status(500).json({ error: "Error al agregar el proveedor" });
   }
 });
 
+
+  
 // Actualizar un proveedor
 app.put('/api/proveedores/:id', async (req, res) => {
   const { id } = req.params;
