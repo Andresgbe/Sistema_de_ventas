@@ -291,6 +291,63 @@ app.delete('/api/proveedores/:id', async (req, res) => {
   }
 });
 
+// -- RUTAS PARA LAS VENTAS -- 
+// Obtener todas las ventas
+app.get("/api/ventas", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM ventas ORDER BY fecha DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+// Registrar una nueva venta
+app.post("/api/ventas", async (req, res) => {
+  const {
+    producto_id,
+    codigo_producto,
+    nombre_producto,
+    descripcion,
+    cantidad,
+    total,
+  } = req.body;
+
+  try {
+    const result = await pool.query(
+      `INSERT INTO ventas (producto_id, codigo_producto, nombre_producto, descripcion, cantidad, total)
+            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      [
+        producto_id,
+        codigo_producto,
+        nombre_producto,
+        descripcion,
+        cantidad,
+        total,
+      ]
+    );
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send(err.detail || "Error en el servidor");
+  }
+});
+
+// Eliminar una venta
+app.delete("/api/ventas/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query("DELETE FROM ventas WHERE id = $1", [id]);
+    res.send("Venta eliminada correctamente");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Error en el servidor");
+  }
+});
+
+
 
 // Iniciar el servidor
 app.listen(5000, () => {

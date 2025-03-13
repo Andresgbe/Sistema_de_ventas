@@ -58,7 +58,7 @@ const ProductsTable = ({ onEdit }) => {
           <TableCell>Código</TableCell>
           <TableCell>Nombre</TableCell>
           <TableCell>Precio</TableCell>
-          <TableCell>Cantidad</TableCell>
+          <TableCell>Stock</TableCell>
           <TableCell>Acciones</TableCell>
         </TableRow>
       </TableHead>
