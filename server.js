@@ -293,31 +293,60 @@ app.delete('/api/proveedores/:id', async (req, res) => {
 
 // -- RUTAS PARA LAS VENTAS -- 
 // Obtener todas las ventas
+// ✅ Obtener todas las ventas
 app.get("/api/ventas", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM ventas ORDER BY fecha DESC");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error en el servidor");
-  }
+    try {
+        const result = await pool.query(
+            `SELECT id, codigo_producto, nombre_producto, descripcion, cantidad, total, fecha
+             FROM ventas
+             ORDER BY fecha DESC`
+        );
+        res.json(result.rows);
+    } catch (error) {
+        console.error("Error al obtener ventas:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
 });
 
-// Registrar una nueva venta
+// ✅ Obtener una venta por ID
+app.get("/api/ventas/:id", async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("SELECT * FROM ventas WHERE id = $1", [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Venta no encontrada" });
+        }
+
+        res.json(result.rows[0]);
+    } catch (error) {
+        console.error("Error al obtener la venta:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+// ✅ Crear una nueva venta
 app.post("/api/ventas", async (req, res) => {
-  const {
-    producto_id,
-    codigo_producto,
-    nombre_producto,
-    descripcion,
-    cantidad,
-    total,
-  } = req.body;
+  const { codigo_producto, descripcion, cantidad } = req.body;
 
   try {
-    const result = await pool.query(
+    const producto = await pool.query(
+      "SELECT id, name, price FROM productos WHERE code = $1",
+      [codigo_producto]
+    );
+
+    if (producto.rows.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    const { id: producto_id, name: nombre_producto, price } = producto.rows[0];
+    const total = cantidad * price;
+
+    // 🔹 INSERTAR Y DEVOLVER LA NUEVA VENTA
+    const newSale = await pool.query(
       `INSERT INTO ventas (producto_id, codigo_producto, nombre_producto, descripcion, cantidad, total)
-            VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
       [
         producto_id,
         codigo_producto,
@@ -328,24 +357,94 @@ app.post("/api/ventas", async (req, res) => {
       ]
     );
 
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send(err.detail || "Error en el servidor");
+    console.log("✅ Venta registrada:", newSale.rows[0]); // Debug en consola del backend
+    res.status(201).json(newSale.rows[0]); // 🔹 DEVOLVER LA VENTA CREADA AL FRONTEND
+  } catch (error) {
+    console.error("❌ Error en `POST /api/ventas`:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// Eliminar una venta
+
+
+// ✅ Actualizar una venta
+app.put("/api/ventas/:id", async (req, res) => {
+    const { id } = req.params;
+    const { codigo_producto, descripcion, cantidad } = req.body;
+
+    try {
+        // Buscar el producto usando su código
+        const producto = await pool.query(
+            "SELECT id, name, price FROM productos WHERE code = $1",
+            [codigo_producto]
+        );
+
+        if (producto.rows.length === 0) {
+            return res.status(404).json({ error: "Producto no encontrado" });
+        }
+
+        const { id: producto_id, name: nombre_producto, price } = producto.rows[0];
+
+        // Calcular el total
+        const total = cantidad * price;
+
+        // Actualizar la venta
+        const updatedSale = await pool.query(
+            `UPDATE ventas 
+             SET producto_id = $1, codigo_producto = $2, nombre_producto = $3, descripcion = $4, cantidad = $5, total = $6
+             WHERE id = $7 RETURNING *`,
+            [producto_id, codigo_producto, nombre_producto, descripcion, cantidad, total, id]
+        );
+
+        if (updatedSale.rows.length === 0) {
+            return res.status(404).json({ error: "Venta no encontrada" });
+        }
+
+        res.json(updatedSale.rows[0]);
+    } catch (error) {
+        console.error("Error al actualizar la venta:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+// ✅ Eliminar una venta
 app.delete("/api/ventas/:id", async (req, res) => {
-  const { id } = req.params;
+    const { id } = req.params;
+
+    try {
+        const result = await pool.query("DELETE FROM ventas WHERE id = $1 RETURNING *", [id]);
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: "Venta no encontrada" });
+        }
+
+        res.json({ message: "Venta eliminada correctamente", deletedSale: result.rows[0] });
+    } catch (error) {
+        console.error("Error al eliminar venta:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+//buscar un producto por su codigo
+app.get("/api/productos/:codigo", async (req, res) => {
+  const { codigo } = req.params;
+
   try {
-    await pool.query("DELETE FROM ventas WHERE id = $1", [id]);
-    res.send("Venta eliminada correctamente");
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send("Error en el servidor");
+    const result = await pool.query("SELECT * FROM productos WHERE code = $1", [
+      codigo,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Producto no encontrado" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error("Error al obtener el producto:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+
 
 
 
