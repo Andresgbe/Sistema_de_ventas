@@ -6,7 +6,7 @@ import "./App.css";
 import Products from "./pages/Products.jsx";
 import Providers from "./pages/Providers.jsx";
 import Sales from "./pages/Sales.jsx";
-import Compras from "./pages/Compras.jsx";
+import Clients from "./pages/Clients.jsx";
 import Users from "./pages/Users.jsx";
 import { AuthProvider, useAuth } from "./components/AuthContext.jsx";
 
@@ -64,8 +64,8 @@ const App = () => {
       <Route path="/sells">
         {isAuthenticated ? <Sales /> : <Redirect to="/" />}
       </Route>
-      <Route path="/purchases">
-        {isAuthenticated ? <Compras /> : <Redirect to="/" />}
+      <Route path="/clients">
+        {isAuthenticated ? <Clients /> : <Redirect to="/" />}
       </Route>
       <Route path="/users">
         {isAuthenticated ? <Users /> : <Redirect to="/" />}
