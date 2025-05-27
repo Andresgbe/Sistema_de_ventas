@@ -297,7 +297,7 @@ app.delete('/api/proveedores/:id', async (req, res) => {
 app.get("/api/ventas", async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id, codigo_producto, nombre_producto, descripcion, cantidad, total, fecha
+            `SELECT id, codigo_producto, nombre_producto, descripcion, cantidad, total, fecha, cliente_id
              FROM ventas
              ORDER BY fecha DESC`
         );
@@ -328,9 +328,25 @@ app.get("/api/ventas/:id", async (req, res) => {
 
 // ✅ Crear una nueva venta
 app.post("/api/ventas", async (req, res) => {
-  const { codigo_producto, descripcion, cantidad } = req.body;
+  const { codigo_producto, descripcion, cantidad, cliente_id } = req.body;
+
+  // Validaciones básicas
+  if (!codigo_producto || !descripcion || !cantidad || !cliente_id) {
+    return res.status(400).json({ error: "Todos los campos son obligatorios" });
+  }
 
   try {
+    // 1. Validar que el cliente existe
+    const clienteValido = await pool.query(
+      "SELECT id FROM clientes WHERE id = $1",
+      [cliente_id]
+    );
+
+    if (clienteValido.rows.length === 0) {
+      return res.status(404).json({ error: "Cliente no encontrado" });
+    }
+
+    // 2. Buscar el producto (lógica existente)
     const producto = await pool.query(
       "SELECT id, name, price FROM productos WHERE code = $1",
       [codigo_producto]
@@ -340,13 +356,23 @@ app.post("/api/ventas", async (req, res) => {
       return res.status(404).json({ error: "Producto no encontrado" });
     }
 
+    // 3. Calcular total (lógica existente)
     const { id: producto_id, name: nombre_producto, price } = producto.rows[0];
     const total = cantidad * price;
 
-    // 🔹 INSERTAR Y DEVOLVER LA NUEVA VENTA
+    // 4. Crear la venta (con cliente_id)
     const newSale = await pool.query(
-      `INSERT INTO ventas (producto_id, codigo_producto, nombre_producto, descripcion, cantidad, total)
-             VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+      `INSERT INTO ventas (
+        producto_id, 
+        codigo_producto, 
+        nombre_producto, 
+        descripcion, 
+        cantidad, 
+        total,
+        cliente_id,
+        fecha
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, CURRENT_DATE) 
+      RETURNING *`,
       [
         producto_id,
         codigo_producto,
@@ -354,13 +380,23 @@ app.post("/api/ventas", async (req, res) => {
         descripcion,
         cantidad,
         total,
+        cliente_id,
       ]
     );
 
-    console.log("✅ Venta registrada:", newSale.rows[0]); // Debug en consola del backend
-    res.status(201).json(newSale.rows[0]); // 🔹 DEVOLVER LA VENTA CREADA AL FRONTEND
+    console.log("✅ Venta registrada:", newSale.rows[0]);
+    res.status(201).json(newSale.rows[0]);
   } catch (error) {
-    console.error("❌ Error en `POST /api/ventas`:", error);
+    console.error("❌ Error en POST /api/ventas:", error);
+
+    // Manejo específico para errores de FK
+    if (error.code === "23503") {
+      // Código de error de FK en PostgreSQL
+      return res.status(400).json({
+        error: "Error de referencia: Cliente o producto no válido",
+      });
+    }
+
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });

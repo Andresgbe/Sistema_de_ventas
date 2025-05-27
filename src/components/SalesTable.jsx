@@ -57,6 +57,7 @@ const SalesTable = ({ onEdit }) => {
           <TableCell>ID</TableCell>
           <TableCell>Código Producto</TableCell>
           <TableCell>Nombre Producto</TableCell>
+          <TableCell>Cliente</TableCell>
           <TableCell>Descripción</TableCell>
           <TableCell>Cantidad</TableCell>
           <TableCell>Total</TableCell>
@@ -69,6 +70,7 @@ const SalesTable = ({ onEdit }) => {
             <TableCell>{sale.id}</TableCell>
             <TableCell>{sale.codigo_producto}</TableCell>
             <TableCell>{sale.nombre_producto}</TableCell>
+            <TableCell>{sale.cliente}</TableCell>
             <TableCell>{sale.descripcion}</TableCell>
             <TableCell>{sale.cantidad}</TableCell>
             <TableCell>{sale.total}</TableCell>

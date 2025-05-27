@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import SalesTable from "../components/SalesTable";
 import Dashboard from "../components/Dashboard";
+import Autocomplete from "@mui/material/Autocomplete";
 
 const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
   const [codigo, setCodigo] = useState("");
@@ -12,6 +13,21 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
   const [cantidad, setCantidad] = useState("");
   const [total, setTotal] = useState("");
   const [productInfo, setProductInfo] = useState(null);
+  const [clients, setClients] = useState([]);
+  const [selectedClient, setSelectedClient] = useState(null);
+
+  useEffect(() => {
+    const loadClients = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/clientes");
+        const data = await response.json();
+        setClients(data);
+      } catch (error) {
+        console.error("Error cargando clientes:", error);
+      }
+    };
+    loadClients();
+  }, []);
 
   useEffect(() => {
     if (editingSale) {
@@ -52,8 +68,9 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!productInfo) {
-      alert("Debes ingresar un código de producto válido.");
+    if (!productInfo || !selectedClient) {
+      // Validación añadida
+      alert("Selecciona un producto y un cliente válido");
       return;
     }
 
@@ -63,6 +80,7 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
       descripcion,
       cantidad,
       total,
+      cliente_id: selectedClient.id,
     });
 
     setCodigo("");
@@ -70,6 +88,7 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
     setCantidad("");
     setTotal("");
     setProductInfo(null);
+    setSelectedClient(null);
   };
 
   return (
@@ -87,6 +106,19 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
             required
           />
         </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <Autocomplete
+            options={clients}
+            getOptionLabel={(client) => client.nombre}
+            value={selectedClient}
+            onChange={(_, newValue) => setSelectedClient(newValue)}
+            renderInput={(params) => (
+              <TextField {...params} label="Seleccionar cliente" required />
+            )}
+          />
+        </Grid>
+
         <Grid item xs={12} sm={6}>
           <TextField
             label="Descripción"
