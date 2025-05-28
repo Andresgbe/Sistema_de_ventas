@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import ClientsTable from "../components/ClientsTable";
 import Dashboard from "../components/Dashboard";
+import Swal from "sweetalert2";
 
 const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
   const [nombre, setNombre] = useState("");
@@ -32,6 +33,17 @@ const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
       return;
     }
 
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Deseas crear este cliente?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí, crear",
+          cancelButtonText: "Cancelar",
+        });
+    
+        if (!result.isConfirmed) return;
+
     if (editingClient) {
       onCreate({
         id: editingClient.id,
@@ -51,6 +63,8 @@ const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
     setTelefono("");
     setDireccion("");
     setCorreo("");
+
+        Swal.fire("¡Éxito!", "El cliente fue creado exitosamente.", "success");
   };
 
   return (

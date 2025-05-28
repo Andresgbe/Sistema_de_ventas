@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField";
 import SalesTable from "../components/SalesTable";
 import Dashboard from "../components/Dashboard";
 import Autocomplete from "@mui/material/Autocomplete";
+import Swal from "sweetalert2";
 
 const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
   const [codigo, setCodigo] = useState("");
@@ -28,6 +29,7 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
     };
     loadClients();
   }, []);
+
 
   useEffect(() => {
     if (editingSale) {
@@ -66,11 +68,26 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas crear esta venta?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, crear",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
     if (!productInfo || !selectedClient) {
-      // Validación añadida
-      alert("Selecciona un producto y un cliente válido");
+      Swal.fire(
+        "Error",
+        "Selecciona un producto y un cliente válido",
+        "warning"
+      );
       return;
     }
 
@@ -89,7 +106,14 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
     setTotal("");
     setProductInfo(null);
     setSelectedClient(null);
+
+    Swal.fire(
+      "Venta creada",
+      "La venta fue registrada exitosamente.",
+      "success"
+    );
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>

@@ -70,7 +70,7 @@ const SalesTable = ({ onEdit }) => {
             <TableCell>{sale.id}</TableCell>
             <TableCell>{sale.codigo_producto}</TableCell>
             <TableCell>{sale.nombre_producto}</TableCell>
-            <TableCell>{sale.cliente_id}</TableCell>
+            <TableCell>{sale.cliente_nombre}</TableCell>
             <TableCell>{sale.descripcion}</TableCell>
             <TableCell>{sale.cantidad}</TableCell>
             <TableCell>{sale.total}</TableCell>

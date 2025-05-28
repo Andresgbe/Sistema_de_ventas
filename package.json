@@ -112,6 +112,7 @@
     "redux-logger": "^3.0.6",
     "rimraf": "^3.0.0",
     "styled-components": "^6.1.11",
+    "sweetalert2": "^11.22.0",
     "url-loader": "^2.1.0",
     "webfontloader": "^1.6.28",
     "webpack": "^4.41.0",

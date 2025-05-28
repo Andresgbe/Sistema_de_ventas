@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import ProvidersTable from "../components/ProvidersTable";
 import Dashboard from "../components/Dashboard";
+import Swal from "sweetalert2";
 
 const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
   const [nombre, setNombre] = useState("");
@@ -30,6 +31,17 @@ const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
       return;
     }
 
+        const result = await Swal.fire({
+          title: "¿Estás seguro?",
+          text: "¿Deseas crear este proveedor?",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonText: "Sí, crear",
+          cancelButtonText: "Cancelar",
+        });
+
+        if (!result.isConfirmed) return;
+
     if (editingProvider) {
       onCreate({
         id: editingProvider.id,
@@ -47,6 +59,8 @@ const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
     setTelefono("");
     setDireccion("");
     setCorreo("");
+
+     Swal.fire("¡Éxito!", "El proveedor fue creado exitosamente.", "success");
   };
 
   return (

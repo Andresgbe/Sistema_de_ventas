@@ -294,19 +294,31 @@ app.delete('/api/proveedores/:id', async (req, res) => {
 // -- RUTAS PARA LAS VENTAS -- 
 
 // ✅ Obtener todas las ventas
+// ✅ Obtener todas las ventas (con nombre del cliente)
 app.get("/api/ventas", async (req, res) => {
-    try {
-        const result = await pool.query(
-            `SELECT id, codigo_producto, nombre_producto, descripcion, cantidad, total, fecha, cliente_id
-             FROM ventas
-             ORDER BY fecha DESC`
-        );
-        res.json(result.rows);
-    } catch (error) {
-        console.error("Error al obtener ventas:", error);
-        res.status(500).json({ error: "Error interno del servidor" });
-    }
+  try {
+    const result = await pool.query(
+      `SELECT 
+        v.id, 
+        v.codigo_producto, 
+        v.nombre_producto, 
+        v.descripcion, 
+        v.cantidad, 
+        v.total, 
+        v.fecha, 
+        v.cliente_id,
+        c.nombre AS cliente_nombre
+      FROM ventas v
+      JOIN clientes c ON v.cliente_id = c.id
+      ORDER BY v.fecha DESC`
+    );
+    res.json(result.rows);
+  } catch (error) {
+    console.error("Error al obtener ventas:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
 });
+
 
 // ✅ Obtener una venta por ID
 app.get("/api/ventas/:id", async (req, res) => {

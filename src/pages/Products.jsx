@@ -5,6 +5,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import ProductsTable from "../components/ProductsTable";
 import Dashboard from "../components/Dashboard";
+import Swal from "sweetalert2";
 
 const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
   const [code, setCode] = useState("");
@@ -30,6 +31,18 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
       return;
     }
 
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas crear este producto?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, crear",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
+
     if (editingProduct) {
       onCreate({ id: editingProduct.id, code, name, price, quantity });
     } else {
@@ -41,6 +54,8 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
     setName("");
     setPrice("");
     setQuantity("");
+
+    Swal.fire("¡Éxito!", "El producto fue creado exitosamente.", "success");
   };
 
   return (
@@ -225,7 +240,7 @@ const Products = () => {
                 <ProductsTable products={products} onEdit={handleEditProduct} />
               )}
             </Paper>
-          </Grid>
+          </Grid> 
         </Grid>
       </Dashboard>
     </div>
