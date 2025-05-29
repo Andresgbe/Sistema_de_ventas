@@ -31,6 +31,11 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
       return;
     }
 
+    if (code.length < 3) {
+      alert("El código del producto debe tener al menos 3 caracteres");
+      return;
+    }    
+
     const result = await Swal.fire({
       title: "¿Estás seguro?",
       text: "¿Deseas crear este producto?",
