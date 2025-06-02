@@ -25,16 +25,49 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación de los campos del formulario
+    // Validar campos vacíos
     if (!code || !name || !price || !quantity) {
-      alert("Todos los campos son obligatorios.");
+      Swal.fire("Error", "Todos los campos son obligatorios.", "warning");
       return;
     }
 
+    // Validar longitud mínima del código
     if (code.length < 3) {
-      alert("El código del producto debe tener al menos 3 caracteres");
+      Swal.fire(
+        "Error",
+        "El código debe tener al menos 3 caracteres.",
+        "warning"
+      );
       return;
-    }    
+    }
+
+    // Verificar si ya existe un producto con ese código (solo al crear)
+    if (!editingProduct) {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/api/productos/${code}`
+        );
+        if (response.ok) {
+          const existing = await response.json();
+          if (existing) {
+            Swal.fire(
+              "Error",
+              "Ya existe un producto con este código.",
+              "error"
+            );
+            return;
+          }
+        }
+      } catch (err) {
+        console.error("Error verificando código:", err);
+        Swal.fire(
+          "Error",
+          "No se pudo validar el código del producto.",
+          "error"
+        );
+        return;
+      }
+    }
 
     const result = await Swal.fire({
       title: "¿Estás seguro?",
@@ -47,14 +80,13 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
 
     if (!result.isConfirmed) return;
 
-
     if (editingProduct) {
       onCreate({ id: editingProduct.id, code, name, price, quantity });
     } else {
       onCreate({ code, name, price, quantity });
     }
 
-    // Restablecer los campos del formulario
+    // Limpiar campos
     setCode("");
     setName("");
     setPrice("");
@@ -62,6 +94,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
 
     Swal.fire("¡Éxito!", "El producto fue creado exitosamente.", "success");
   };
+  
 
   return (
     <form onSubmit={handleSubmit}>

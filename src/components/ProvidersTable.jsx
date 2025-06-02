@@ -7,6 +7,7 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import Swal from "sweetalert2";
 
 const ProvidersTable = ({ onEdit }) => {
   const [providers, setProviders] = useState([]);
@@ -25,25 +26,46 @@ const ProvidersTable = ({ onEdit }) => {
     }
   };
 
-  // Función para eliminar un proveedor
   const handleDeleteProvider = async (id) => {
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "Esta acción eliminará el proveedor. ¿Deseas continuar?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
+
     try {
-      console.log(`Intentando eliminar el proveedor con ID: ${id}`); // Ajustado el uso de la flecha
-      const response = await fetch(`http://localhost:5000/api/proveedores/${id}`, {
-        method: "DELETE",
-      });
+      console.log(`Intentando eliminar el proveedor con ID: ${id}`);
+      const response = await fetch(
+        `http://localhost:5000/api/proveedores/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Error al eliminar el proveedor");
       }
 
       // Actualizar la lista de proveedores después de la eliminación
-      setProviders(providers.filter((provider) => provider.id !== id)); // Corrección en lógica de eliminación
+      setProviders((prev) => prev.filter((provider) => provider.id !== id));
       console.log(`Proveedor con ID: ${id} eliminado con éxito`);
+
+      Swal.fire(
+        "Eliminado",
+        "El proveedor fue eliminado exitosamente.",
+        "success"
+      );
     } catch (error) {
       console.error("Error al eliminar proveedor:", error);
+      Swal.fire("Error", "No se pudo eliminar el proveedor.", "error");
     }
   };
+  
 
   // Cargar los proveedores cuando se monta el componente
   useEffect(() => {

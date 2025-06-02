@@ -91,28 +91,57 @@ const CreateSaleForm = ({ onCreate, editingSale, onCancelEdit }) => {
       return;
     }
 
-    onCreate({
-      codigo_producto: codigo,
-      nombre_producto: productInfo.name,
-      descripcion,
-      cantidad,
-      total,
-      cliente_id: selectedClient.id,
-    });
+    if (!descripcion || !cantidad || cantidad <= 0) {
+      Swal.fire("Error", "Completa todos los campos correctamente", "warning");
+      return;
+    }
 
-    setCodigo("");
-    setDescripcion("");
-    setCantidad("");
-    setTotal("");
-    setProductInfo(null);
-    setSelectedClient(null);
+    try {
+      const response = await fetch("http://localhost:5000/api/ventas", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          codigo_producto: codigo,
+          descripcion,
+          cantidad,
+          cliente_id: selectedClient.id,
+        }),
+      });
 
-    Swal.fire(
-      "Venta creada",
-      "La venta fue registrada exitosamente.",
-      "success"
-    );
+      if (!response.ok) {
+        const errorData = await response.json();
+        Swal.fire(
+          "Error",
+          errorData.error || "Error al registrar la venta",
+          "error"
+        );
+        return;
+      }
+
+      const data = await response.json();
+
+      onCreate(data); // respuesta completa del backend
+
+      setCodigo("");
+      setDescripcion("");
+      setCantidad("");
+      setTotal("");
+      setProductInfo(null);
+      setSelectedClient(null);
+
+      Swal.fire(
+        "Venta creada",
+        "La venta fue registrada exitosamente.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Error al registrar la venta:", error);
+      Swal.fire("Error", "Ocurrió un error inesperado", "error");
+    }
   };
+  
   
 
   return (

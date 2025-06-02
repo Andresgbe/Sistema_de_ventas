@@ -160,17 +160,45 @@ app.get('/api/productos', async (req, res) => {
 });
 
 // Agregar un producto nuevo
-app.post('/api/productos', async (req, res) => {
+app.post("/api/productos", async (req, res) => {
   const { code, name, price, quantity } = req.body;
+
+  // Validación básica
+  if (!code || code.length < 3 || !name || !price || !quantity) {
+    return res
+      .status(400)
+      .json({
+        error:
+          "Todos los campos son obligatorios y el código debe tener al menos 3 caracteres.",
+      });
+  }
+
   try {
+    // Verificar si ya existe un producto con el mismo código
+    const existing = await pool.query(
+      "SELECT * FROM productos WHERE code = $1",
+      [code]
+    );
+
+    if (existing.rows.length > 0) {
+      return res
+        .status(409)
+        .json({ error: "Ya existe un producto con este código." });
+    }
+
+    // Insertar el producto
     const result = await pool.query(
-      'INSERT INTO productos (code, name, price, quantity) VALUES ($1, $2, $3, $4) RETURNING *',
+      "INSERT INTO productos (code, name, price, quantity) VALUES ($1, $2, $3, $4) RETURNING *",
       [code, name, price, quantity]
     );
-    res.status(201).json({ message: 'Producto agregado exitosamente', product: result.rows[0] });
+
+    res.status(201).json({
+      message: "Producto agregado exitosamente",
+      product: result.rows[0],
+    });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Error al agregar el producto' });
+    console.error("Error al agregar el producto:", err);
+    res.status(500).json({ error: "Error al agregar el producto" });
   }
 });
 
