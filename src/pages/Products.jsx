@@ -25,7 +25,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validar campos vacíos
+    // Validación de campos obligatorios
     if (!code || !name || !price || !quantity) {
       Swal.fire("Error", "Todos los campos son obligatorios.", "warning");
       return;
@@ -41,22 +41,37 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
       return;
     }
 
-    // Verificar si ya existe un producto con ese código (solo al crear)
+    // Validar que el precio y cantidad sean enteros positivos
+    const precioNum = Number(price);
+    const cantidadNum = Number(quantity);
+
+    if (!Number.isInteger(cantidadNum) || cantidadNum <= 0) {
+      Swal.fire(
+        "Error",
+        "La cantidad debe ser un número entero positivo.",
+        "warning"
+      );
+      return;
+    }
+
+    if (!Number.isFinite(precioNum) || precioNum <= 0) {
+      Swal.fire(
+        "Error",
+        "El precio debe ser un número positivo válido.",
+        "warning"
+      );
+      return;
+    }
+
+    // Verificar duplicado solo si es creación
     if (!editingProduct) {
       try {
         const response = await fetch(
           `http://localhost:5000/api/productos/${code}`
         );
         if (response.ok) {
-          const existing = await response.json();
-          if (existing) {
-            Swal.fire(
-              "Error",
-              "Ya existe un producto con este código.",
-              "error"
-            );
-            return;
-          }
+          Swal.fire("Error", "Ya existe un producto con este código.", "error");
+          return;
         }
       } catch (err) {
         console.error("Error verificando código:", err);
@@ -80,13 +95,19 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
 
     if (!result.isConfirmed) return;
 
+    const newProduct = {
+      code,
+      name,
+      price: precioNum,
+      quantity: cantidadNum,
+    };
+
     if (editingProduct) {
-      onCreate({ id: editingProduct.id, code, name, price, quantity });
+      onCreate({ ...newProduct, id: editingProduct.id });
     } else {
-      onCreate({ code, name, price, quantity });
+      onCreate(newProduct);
     }
 
-    // Limpiar campos
     setCode("");
     setName("");
     setPrice("");
@@ -94,6 +115,7 @@ const CreateProductForm = ({ onCreate, editingProduct, onCancelEdit }) => {
 
     Swal.fire("¡Éxito!", "El producto fue creado exitosamente.", "success");
   };
+  
   
 
   return (
@@ -249,7 +271,7 @@ const Products = () => {
                   setEditingProduct(null); // Limpiar la edición anterior
                 }}
               >
-                Crear nuevo producto
+                Registrar nuevo producto
               </Button>
             )}
           </Grid>

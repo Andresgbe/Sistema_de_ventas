@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
-import SignIn from "./pages/SignIn";
-import Home from "./pages/Home.jsx";
-import "./App.css";
-import Products from "./pages/Products.jsx";
-import Providers from "./pages/Providers.jsx";
-import Sales from "./pages/Sales.jsx";
-import Clients from "./pages/Clients.jsx";
-import Users from "./pages/Users.jsx";
-import { AuthProvider, useAuth } from "./components/AuthContext.jsx";
+import SignIn from "../frontend/design/login/SignInView.jsx";
+// import SignIn from "./components/SignInView.jsx";
+import Home from "../frontend/design/principal/Home.jsx";
+//import Products from "./pages/Products.jsx";
+//import Providers from "./pages/Providers.jsx";
+//import Sales from "./pages/Sales.jsx";
+import ClientsPage from "../frontend/views/clientfront/ClientsPage.jsx"
+//import Users from "./pages/Users.jsx";
+import { AuthProvider, useAuth } from "../frontend/design/login/AuthContext.jsx";
+
 
 
 const App = () => {
@@ -56,19 +57,19 @@ const App = () => {
         {isAuthenticated ? <Home /> : <Redirect to="/" />}
       </Route>
       <Route path="/products">
-        {isAuthenticated ? <Products /> : <Redirect to="/" />}
+        {/*isAuthenticated ? <Products /> : <Redirect to="/" />*/}
       </Route>
       <Route path="/providers">
-        {isAuthenticated ? <Providers /> : <Redirect to="/" />}
+        {/*isAuthenticated ? <Providers /> : <Redirect to="/" />*/}
       </Route>
       <Route path="/sells">
-        {isAuthenticated ? <Sales /> : <Redirect to="/" />}
+        {/*isAuthenticated ? <Sales /> : <Redirect to="/" />*/}
       </Route>
       <Route path="/clients">
-        {isAuthenticated ? <Clients /> : <Redirect to="/" />}
+        {isAuthenticated ? <ClientsPage /> : <Redirect to="/" />}
       </Route>
       <Route path="/users">
-        {isAuthenticated ? <Users /> : <Redirect to="/" />}
+        {/*isAuthenticated ? <Users /> : <Redirect to="/" />*/}
       </Route>
     </Router>
     </AuthProvider>

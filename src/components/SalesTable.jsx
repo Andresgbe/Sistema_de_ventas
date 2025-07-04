@@ -7,6 +7,53 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+
+const handlePrintInvoice = (sale) => {
+  const facturaHtml = `
+    <html>
+      <head>
+        <title>Factura #${sale.id}</title>
+        <style>
+          body { font-family: Arial; padding: 20px; }
+          h2 { color: #333; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        </style>
+      </head>
+      <body>
+        <h2>Factura de Venta #${sale.id}</h2>
+        <p><strong>Cliente:</strong> ${sale.cliente_nombre}</p>
+        <p><strong>Producto:</strong> ${sale.nombre_producto} (${
+    sale.codigo_producto
+  })</p>
+        <p><strong>Descripción:</strong> ${sale.descripcion}</p>
+        <p><strong>Cantidad:</strong> ${sale.cantidad}</p>
+        <p><strong>Total:</strong> $${sale.total}</p>
+        <p><strong>Fecha:</strong> ${new Date(sale.fecha).toLocaleDateString(
+          "es-VE",
+          {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          }
+        )}</p>
+        <br><br>
+        <p>Gracias por su compra.</p>
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+    </html>
+  `;
+
+  const printWindow = window.open("", "_blank");
+  printWindow.document.write(facturaHtml);
+  printWindow.document.close();
+};
+
 
 const SalesTable = ({ onEdit }) => {
   const [sales, setSales] = useState([]);
@@ -83,6 +130,12 @@ const SalesTable = ({ onEdit }) => {
                 onClick={() => handleDeleteSale(sale.id)}
               >
                 <DeleteIcon />
+              </IconButton>
+              <IconButton
+                aria-label="print"
+                onClick={() => handlePrintInvoice(sale)}
+              >
+                <ReceiptLongIcon />
               </IconButton>
             </TableCell>
           </TableRow>

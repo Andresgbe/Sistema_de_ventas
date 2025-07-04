@@ -1,4 +1,22 @@
-import React, { useState, useEffect } from "react";
+// import React from "react";
+import Dashboard from "../../design/principal/Dashboard.jsx"
+import ClientsContainer from "./ClientsContainer";
+
+/*
+---------------------------------
+*/
+
+const ClientsPage = () => {
+  return (
+    <Dashboard>
+      <ClientsContainer />
+    </Dashboard>
+  );
+};
+
+export default ClientsPage;
+
+/* import React, { useState, useEffect } from "react";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
@@ -24,6 +42,17 @@ const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
     }
   }, [editingClient]);
 
+  const esTelefonoValido = (telefono) => {
+    const regex = /^[0-9]{7,11}$/;
+    return regex.test(telefono);
+  };
+  
+  const esCorreoValido = (correo) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(correo);
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,6 +61,25 @@ const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
       alert("Todos los campos son obligatorios.");
       return;
     }
+
+    if (!esTelefonoValido(telefono)) {
+      Swal.fire(
+        "Error",
+        "El teléfono no es valido",
+        "warning"
+      );
+      return;
+    }
+    
+    if (!esCorreoValido(correo)) {
+      Swal.fire(
+        "Error",
+        "El correo ingresado no tiene un formato válido.",
+        "warning"
+      );
+      return;
+    }
+    
 
         const result = await Swal.fire({
           title: "¿Estás seguro?",
@@ -115,7 +163,7 @@ const CreateClientForm = ({ onCreate, editingClient, onCancelEdit }) => {
             {editingClient ? "Actualizar Cliente" : "Crear Cliente"}
           </Button>
 
-          {/* Botón de cancelar */}
+          
           <Button
             type="button"
             variant="text"
@@ -218,7 +266,7 @@ const Clients = () => {
     <div>
       <Dashboard>
         <Grid container spacing={2}>
-          {/* Botón para crear un nuevo cliente */}
+
           <Grid item xs={12} sx={{ mb: 2 }}>
             {!showForm && (
               <Button
@@ -234,7 +282,7 @@ const Clients = () => {
             )}
           </Grid>
 
-          {/* Mostrar formulario si showForm es true */}
+    
           {showForm && (
             <Grid item xs={12}>
               <Paper sx={{ p: 2 }}>
@@ -266,3 +314,4 @@ const Clients = () => {
 };
 
 export default Clients;
+*/

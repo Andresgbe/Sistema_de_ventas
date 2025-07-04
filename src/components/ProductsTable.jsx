@@ -7,9 +7,12 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import TextField from "@mui/material/TextField";
 
 const ProductsTable = ({ onEdit }) => { 
   const [products, setProducts] = useState([]);
+  const [searchCode, setSearchCode] = useState("");
+
 
   //cargar los productos desde el back
   const fetchProducts = async () => {
@@ -51,43 +54,53 @@ const ProductsTable = ({ onEdit }) => {
   }, []);
 
   return (
-    <Table>
-      <TableHead>
-        <TableRow>
-          <TableCell>ID</TableCell>
-          <TableCell>Código</TableCell>
-          <TableCell>Nombre</TableCell>
-          <TableCell>Precio</TableCell>
-          <TableCell>Stock</TableCell>
-          <TableCell>Acciones</TableCell>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {products.map((product) => (
-          <TableRow key={product.id}>
-            <TableCell>{product.id}</TableCell>
-            <TableCell>{product.code}</TableCell>
-            <TableCell>{product.name}</TableCell>
-            <TableCell>{product.price}</TableCell>
-            <TableCell>{product.quantity}</TableCell>
-            <TableCell>
-              <IconButton
-                aria-label="edit"
-                onClick={() => onEdit(product)} 
-              >
-                <EditIcon />
-              </IconButton>
-              <IconButton
-                aria-label="delete"
-                onClick={() => handleDeleteProduct(product.id)} // Conservado sin cambios
-              >
-                <DeleteIcon />
-              </IconButton>
-            </TableCell>
+    <>
+      <TextField
+        label="Buscar por código"
+        variant="outlined"
+        value={searchCode}
+        onChange={(e) => setSearchCode(e.target.value.toUpperCase())}
+        size="small"
+        style={{ marginBottom: "16px" }}
+      />
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Código</TableCell>
+            <TableCell>Nombre</TableCell>
+            <TableCell>Precio</TableCell>
+            <TableCell>Stock</TableCell>
+            <TableCell>Acciones</TableCell>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHead>
+        <TableBody>
+          {products
+            .filter((product) => product.code.includes(searchCode))
+            .map((product) => (
+              <TableRow key={product.id}>
+                <TableCell>{product.id}</TableCell>
+                <TableCell>{product.code}</TableCell>
+                <TableCell>{product.name}</TableCell>
+                <TableCell>{product.price}</TableCell>
+                <TableCell>{product.quantity}</TableCell>
+                <TableCell>
+                  <IconButton aria-label="edit" onClick={() => onEdit(product)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    onClick={() => handleDeleteProduct(product.id)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+        </TableBody>
+      </Table>
+    </>
   );
 };
 

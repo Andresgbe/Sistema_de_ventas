@@ -1,9 +1,11 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
-import pool from './dbConfig.js'; // Importa la conexión a PostgreSQL
+import pool from './dbConfig.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt'; 
+import clientRoutes from "../../logic/clientback/clientController.js";
+
 // import { userSetter } from 'core-js/fn/symbol';
 
 pool.query("SELECT NOW()", (err, res) => {
@@ -13,12 +15,16 @@ pool.query("SELECT NOW()", (err, res) => {
     console.log("Conexión exitosa con PostgreSQL:", res.rows);
   }
 });
-
+ 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// --- RUTAS PARA CLIENTES ---
+app.use("/api/clientes", clientRoutes);
+
 
 // --- RUTAS PARA USUARIOS ---
 
@@ -319,10 +325,10 @@ app.delete('/api/proveedores/:id', async (req, res) => {
   }
 });
 
+
 // -- RUTAS PARA LAS VENTAS -- 
 
 // ✅ Obtener todas las ventas
-// ✅ Obtener todas las ventas (con nombre del cliente)
 app.get("/api/ventas", async (req, res) => {
   try {
     const result = await pool.query(
@@ -437,7 +443,7 @@ app.post("/api/ventas", async (req, res) => {
       });
     }
 
-    res.status(500).json({ error: "Error interno del servidor" });
+    res.status(500).json({ error: "No hay stock suficiente para esta compra" });
   }
 });
 
@@ -519,82 +525,6 @@ app.get("/api/productos/:codigo", async (req, res) => {
   }
 });
 
-// -- RUTAS PARA LOS CLIENTES -- 
-
-// Obtener todos los clientes
-app.get('/api/clientes', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT * FROM clientes');
-    res.json(result.rows);
-  } catch (err) {
-    console.error('Error al obtener los clientes:', err);
-    res.status(500).json({ error: 'Error al obtener los clientes' });
-  }
-});
-
-// Obtener un cliente por ID
-app.get('/api/clientes/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query('SELECT * FROM clientes WHERE id = $1', [id]);
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Error al obtener el cliente:', err);
-    res.status(500).json({ error: 'Error al obtener el cliente' });
-  }
-});
-
-// Crear un nuevo cliente (incluyendo cédula)
-app.post('/api/clientes', async (req, res) => {
-  const { nombre, cedula, telefono, direccion, correo } = req.body;
-  try {
-    const result = await pool.query(
-      'INSERT INTO clientes (nombre, cedula, telefono, direccion, correo) VALUES ($1, $2, $3, $4, $5) RETURNING *',
-      [nombre, cedula, telefono, direccion, correo]
-    );
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Error al crear cliente:', err);
-    res.status(500).json({ error: 'Error al crear cliente' });
-  }
-});
-
-// Actualizar un cliente (incluyendo cédula)
-app.put('/api/clientes/:id', async (req, res) => {
-  const { id } = req.params;
-  const { nombre, cedula, telefono, direccion, correo } = req.body;
-  try {
-    const result = await pool.query(
-      'UPDATE clientes SET nombre=$1, cedula=$2, telefono=$3, direccion=$4, correo=$5 WHERE id=$6 RETURNING *',
-      [nombre, cedula, telefono, direccion, correo, id]
-    );
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.json(result.rows[0]);
-  } catch (err) {
-    console.error('Error al actualizar cliente:', err);
-    res.status(500).json({ error: 'Error al actualizar cliente' });
-  }
-});
-
-// Eliminar un cliente
-app.delete('/api/clientes/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const result = await pool.query('DELETE FROM clientes WHERE id=$1 RETURNING *', [id]);
-    if (result.rowCount === 0) {
-      return res.status(404).json({ error: 'Cliente no encontrado' });
-    }
-    res.status(200).json({ message: 'Cliente eliminado correctamente' });
-  } catch (err) {
-    console.error('Error al eliminar cliente:', err);
-    res.status(500).json({ error: 'Error al eliminar cliente' });
-  }
-});
 
 // Iniciar el servidor
 app.listen(5000, () => {

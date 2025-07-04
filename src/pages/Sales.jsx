@@ -314,7 +314,7 @@ const Sales = () => {
                   setEditingSale(null);
                 }}
               >
-                Crear nueva venta
+                Registrar nueva venta
               </Button>
             )}
           </Grid>

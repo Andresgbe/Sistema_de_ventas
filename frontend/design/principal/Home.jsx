@@ -1,8 +1,8 @@
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import Deposits from "../components/Deposits";
-import Orders from "../components/Orders";
-import Dashboard from "../components/Dashboard";
+//import Deposits from "../components/Deposits";
+//import Orders from "../components/Orders";
+import Dashboard from "./Dashboard.jsx";
 
 const Home = () => (
   <div>
@@ -29,13 +29,13 @@ const Home = () => (
               height: 240,
             }}
           >
-            <Deposits />
+            {/* <Deposits /> */}
           </Paper>
         </Grid>
         {/* Recent Orders */}
         <Grid item xs={12}>
           <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-            <Orders />
+            {/* <Orders /> */}
           </Paper>
         </Grid>
       </Grid>

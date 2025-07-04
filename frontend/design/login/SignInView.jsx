@@ -12,7 +12,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { useAuth } from "../components/AuthContext";
+//import { useAuth } from "../components/AuthContext";
 
 // Estilos personalizados
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +40,7 @@ const SignIn = () => {
   const [correo, setCorreo] = useState(""); 
   const [contraseña, setContraseña] = useState(""); 
   const [error, setError] = useState(""); 
-  const { setIsAuthenticated, setUserRole } = useAuth();
+  /*const { setIsAuthenticated, setUserRole } = useAuth();*/
 
   // Manejadores de cambio de input
   const handleEmailChange = (e) => setCorreo(e.target.value);
@@ -68,8 +68,8 @@ const SignIn = () => {
       localStorage.setItem("token", data.token);
 
       // Actualizar el estado global con la autenticación y el rol
-      setIsAuthenticated(true);
-      setUserRole(data.role); 
+      /*setIsAuthenticated(true);
+      setUserRole(data.role); */
 
       alert("Inicio de sesión exitoso");
       // redirigir a otra página o actualizar estado global

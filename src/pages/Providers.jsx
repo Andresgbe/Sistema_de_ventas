@@ -22,25 +22,55 @@ const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
     }
   }, [editingProvider]);
 
+  const esCorreoValido = (correo) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(correo);
+  };
+  
+  const esTelefonoValido = (telefono) => {
+    const regex = /^[0-9]{7,11}$/;
+    return regex.test(telefono);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validación de los campos del formulario
+    // Validación de campos vacíos
     if (!nombre || !telefono || !direccion || !correo) {
-      alert("Todos los campos son obligatorios.");
+      Swal.fire("Error", "Todos los campos son obligatorios.", "warning");
       return;
     }
 
-        const result = await Swal.fire({
-          title: "¿Estás seguro?",
-          text: "¿Deseas crear este proveedor?",
-          icon: "question",
-          showCancelButton: true,
-          confirmButtonText: "Sí, crear",
-          cancelButtonText: "Cancelar",
-        });
+        if (!esTelefonoValido(telefono)) {
+          Swal.fire(
+            "Error",
+            "El telefono no es valido",
+            "warning"
+          );
+          return;
+        }
+        
 
-        if (!result.isConfirmed) return;
+    // Validar formato de correo
+    if (!esCorreoValido(correo)) {
+      Swal.fire(
+        "Error",
+        "El correo ingresado no tiene un formato válido.",
+        "warning"
+      );
+      return;
+    }
+
+    const result = await Swal.fire({
+      title: "¿Estás seguro?",
+      text: "¿Deseas crear este proveedor?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Sí, crear",
+      cancelButtonText: "Cancelar",
+    });
+
+    if (!result.isConfirmed) return;
 
     if (editingProvider) {
       onCreate({
@@ -54,15 +84,15 @@ const CreateProviderForm = ({ onCreate, editingProvider, onCancelEdit }) => {
       onCreate({ nombre, telefono, direccion, correo });
     }
 
-    // Restablecer los campos del formulario
+    // Limpiar formulario
     setNombre("");
     setTelefono("");
     setDireccion("");
     setCorreo("");
 
-     Swal.fire("¡Éxito!", "El proveedor fue creado exitosamente.", "success");
+    Swal.fire("¡Éxito!", "El proveedor fue creado exitosamente.", "success");
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <Grid container spacing={2}>
