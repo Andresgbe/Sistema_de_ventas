@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  fetchClients,
-  createClient,
-  updateClient,
-  deleteClient,
-} from "./ClientService";
+import { fetchSales, createSale, updateSale, deleteSale } from "./SaleService";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Button from "@mui/material/Button";
@@ -19,108 +14,91 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Swal from "sweetalert2";
 
-const ClientsContainer = () => {
-  const [clients, setClients] = useState([]);
-  const [editingClient, setEditingClient] = useState(null);
+const SalesContainer = () => {
+  const [sales, setSales] = useState([]);
+  const [editingSale, setEditingSale] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [nombre, setNombre] = useState("");
-  const [cedula, setCedula] = useState("");
-  const [telefono, setTelefono] = useState("");
-  const [direccion, setDireccion] = useState("");
-  const [correo, setCorreo] = useState("");
+  const [codigoProducto, setCodigoProducto] = useState("");
+  const [clienteId, setClienteId] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [cantidad, setCantidad] = useState("");
+  const [total, setTotal] = useState("");
 
-  const loadClients = async () => {
+  const loadSales = async () => {
     try {
-      const data = await fetchClients();
-      setClients(data);
+      const data = await fetchSales();
+      setSales(data);
     } catch (error) {
-      console.error("Error al cargar los clientes:", error);
+      console.error("Error al cargar las ventas:", error);
     }
   };
 
   useEffect(() => {
-    loadClients();
+    loadSales();
   }, []);
 
   useEffect(() => {
-    if (editingClient) {
-      setNombre(editingClient.nombre);
-      setCedula(editingClient.cedula);
-      setTelefono(editingClient.telefono);
-      setDireccion(editingClient.direccion);
-      setCorreo(editingClient.correo);
+    if (editingSale) {
+      setCodigoProducto(editingSale.codigo_producto);
+      setClienteId(editingSale.cliente_id);
+      setDescripcion(editingSale.descripcion);
+      setCantidad(editingSale.cantidad);
+      setTotal(editingSale.total);
     } else {
       resetForm();
     }
-  }, [editingClient]);
+  }, [editingSale]);
 
   const resetForm = () => {
-    setNombre("");
-    setCedula("");
-    setTelefono("");
-    setDireccion("");
-    setCorreo("");
+    setCodigoProducto("");
+    setClienteId("");
+    setDescripcion("");
+    setCantidad("");
+    setTotal("");
   };
-
-  const esTelefonoValido = (tlf) => /^[0-9]{7,11}$/.test(tlf);
-  const esCorreoValido = (mail) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail);
 
   const handleCreateOrUpdate = async (e) => {
     e.preventDefault();
 
-    if (!nombre || !cedula || !telefono || !direccion || !correo) {
+    if (!codigoProducto || !clienteId || !descripcion || !cantidad) {
       Swal.fire("Error", "Todos los campos son obligatorios", "warning");
       return;
     }
 
-    if (!esTelefonoValido(telefono)) {
-      Swal.fire(
-        "Error",
-        "El teléfono debe tener entre 7 y 11 dígitos",
-        "warning"
-      );
-      return;
-    }
-
-    if (!esCorreoValido(correo)) {
-      Swal.fire("Error", "El correo ingresado no es válido", "warning");
-      return;
-    }
-
-    const clientData = {
-      id: editingClient?.id,
-      nombre,
-      cedula,
-      telefono,
-      direccion,
-      correo,
+    const saleData = {
+      id: editingSale?.id,
+      codigo_producto: codigoProducto,
+      cliente_id: clienteId,
+      descripcion,
+      cantidad,
+      total,
     };
 
     try {
-      if (clientData.id) {
-        await updateClient(clientData.id, clientData);
-        Swal.fire("Actualizado", "Cliente actualizado exitosamente", "success");
+      if (saleData.id) {
+        await updateSale(saleData.id, saleData);
+        Swal.fire("Actualizado", "Venta actualizada exitosamente", "success");
       } else {
-        await createClient(clientData);
-        Swal.fire("Creado", "Cliente creado exitosamente", "success");
+        await createSale(saleData);
+        Swal.fire("Creada", "Venta registrada exitosamente", "success");
       }
-      await loadClients();
-      setEditingClient(null);
+      await loadSales();
+      setEditingSale(null);
       setShowForm(false);
       resetForm();
     } catch (error) {
-      console.error("Error al guardar cliente:", error);
+      console.error("Error al guardar venta:", error);
       Swal.fire("Error", error.message, "error");
     }
   };
 
-  const handleEdit = (client) => {
-    setEditingClient(client);
+  const handleEdit = (sale) => {
+    setEditingSale(sale);
     setShowForm(true);
   };
 
   const handleCancel = () => {
-    setEditingClient(null);
+    setEditingSale(null);
     setShowForm(false);
     resetForm();
   };
@@ -128,7 +106,7 @@ const ClientsContainer = () => {
   const handleDelete = async (id) => {
     const result = await Swal.fire({
       title: "¿Estás seguro?",
-      text: "Esta acción eliminará el cliente.",
+      text: "Esta acción eliminará la venta.",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Sí, eliminar",
@@ -138,9 +116,9 @@ const ClientsContainer = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await deleteClient(id);
-      Swal.fire("Eliminado", "Cliente eliminado exitosamente", "success");
-      await loadClients();
+      await deleteSale(id);
+      Swal.fire("Eliminada", "Venta eliminada exitosamente", "success");
+      await loadSales();
     } catch (error) {
       Swal.fire("Error", error.message, "error");
     }
@@ -155,11 +133,11 @@ const ClientsContainer = () => {
             color="primary"
             onClick={() => {
               setShowForm(true);
-              setEditingClient(null);
+              setEditingSale(null);
               resetForm();
             }}
           >
-            Crear nuevo cliente
+            Crear nueva venta
           </Button>
         )}
       </Grid>
@@ -171,47 +149,47 @@ const ClientsContainer = () => {
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Nombre"
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
+                    label="Código Producto"
+                    value={codigoProducto}
+                    onChange={(e) => setCodigoProducto(e.target.value)}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Cédula"
-                    value={cedula}
-                    onChange={(e) => setCedula(e.target.value)}
+                    label="ID Cliente"
+                    value={clienteId}
+                    onChange={(e) => setClienteId(e.target.value)}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Teléfono"
-                    value={telefono}
-                    onChange={(e) => setTelefono(e.target.value)}
+                    label="Descripción"
+                    value={descripcion}
+                    onChange={(e) => setDescripcion(e.target.value)}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Dirección"
-                    value={direccion}
-                    onChange={(e) => setDireccion(e.target.value)}
+                    label="Cantidad"
+                    value={cantidad}
+                    onChange={(e) => setCantidad(e.target.value)}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
-                    label="Correo"
-                    value={correo}
-                    onChange={(e) => setCorreo(e.target.value)}
+                    label="Total"
+                    value={total}
+                    onChange={(e) => setTotal(e.target.value)}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12}>
                   <Button type="submit" variant="contained" color="primary">
-                    {editingClient ? "Actualizar Cliente" : "Crear Cliente"}
+                    {editingSale ? "Actualizar Venta" : "Crear Venta"}
                   </Button>
                   <Button
                     type="button"
@@ -235,33 +213,33 @@ const ClientsContainer = () => {
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
-                <TableCell>Nombre</TableCell>
-                <TableCell>Cédula</TableCell>
-                <TableCell>Teléfono</TableCell>
-                <TableCell>Dirección</TableCell>
-                <TableCell>Correo</TableCell>
+                <TableCell>Código Producto</TableCell>
+                <TableCell>ID Cliente</TableCell>
+                <TableCell>Descripción</TableCell>
+                <TableCell>Cantidad</TableCell>
+                <TableCell>Total</TableCell>
                 <TableCell>Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {clients.map((client) => (
-                <TableRow key={client.id}>
-                  <TableCell>{client.id}</TableCell>
-                  <TableCell>{client.nombre}</TableCell>
-                  <TableCell>{client.cedula}</TableCell>
-                  <TableCell>{client.telefono}</TableCell>
-                  <TableCell>{client.direccion}</TableCell>
-                  <TableCell>{client.correo}</TableCell>
+              {sales.map((sale) => (
+                <TableRow key={sale.id}>
+                  <TableCell>{sale.id}</TableCell>
+                  <TableCell>{sale.codigo_producto}</TableCell>
+                  <TableCell>{sale.cliente_id}</TableCell>
+                  <TableCell>{sale.descripcion}</TableCell>
+                  <TableCell>{sale.cantidad}</TableCell>
+                  <TableCell>{sale.total}</TableCell>
                   <TableCell>
                     <IconButton
                       aria-label="edit"
-                      onClick={() => handleEdit(client)}
+                      onClick={() => handleEdit(sale)}
                     >
                       <EditIcon />
                     </IconButton>
                     <IconButton
                       aria-label="delete"
-                      onClick={() => handleDelete(client.id)}
+                      onClick={() => handleDelete(sale.id)}
                     >
                       <DeleteIcon />
                     </IconButton>
@@ -276,4 +254,4 @@ const ClientsContainer = () => {
   );
 };
 
-export default ClientsContainer;
+export default SalesContainer;

@@ -5,9 +5,9 @@ import SignIn from "../frontend/design/login/SignInView.jsx";
 import Home from "../frontend/design/principal/Home.jsx";
 //import Products from "./pages/Products.jsx";
 //import Providers from "./pages/Providers.jsx";
-//import Sales from "./pages/Sales.jsx";
+import SalesPage from "../frontend/views/salefront/SalesPage.jsx";
 import ClientsPage from "../frontend/views/clientfront/ClientsPage.jsx"
-//import Users from "./pages/Users.jsx";
+import ProductsPage from "../frontend/views/productfront/ProductsPage.jsx";
 import { AuthProvider, useAuth } from "../frontend/design/login/AuthContext.jsx";
 
 
@@ -57,13 +57,13 @@ const App = () => {
         {isAuthenticated ? <Home /> : <Redirect to="/" />}
       </Route>
       <Route path="/products">
-        {/*isAuthenticated ? <Products /> : <Redirect to="/" />*/}
+        {isAuthenticated ? <ProductsPage /> : <Redirect to="/" />}
       </Route>
       <Route path="/providers">
         {/*isAuthenticated ? <Providers /> : <Redirect to="/" />*/}
       </Route>
       <Route path="/sells">
-        {/*isAuthenticated ? <Sales /> : <Redirect to="/" />*/}
+        {isAuthenticated ? <SalesPage /> : <Redirect to="/" />}
       </Route>
       <Route path="/clients">
         {isAuthenticated ? <ClientsPage /> : <Redirect to="/" />}
