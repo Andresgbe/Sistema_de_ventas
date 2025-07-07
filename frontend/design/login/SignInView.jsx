@@ -79,6 +79,7 @@ const SignIn = () => {
     }
   };
 
+  // Renderizado del formulario de inicio de sesión
   return (
     <div
       style={{
@@ -89,13 +90,17 @@ const SignIn = () => {
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
+          {/* Icono de usuario */}
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
+          {/* Título del formulario */}
           <Typography component="h1" variant="h5">
             Iniciar Sesión
           </Typography>
+          {/* Formulario de inicio de sesión */}
           <form className={classes.form} noValidate>
+            {/* Campo para el correo electrónico */}
             <TextField
               variant="outlined"
               margin="normal"
@@ -108,6 +113,7 @@ const SignIn = () => {
               autoFocus
               onChange={handleEmailChange}
             />
+            {/* Campo para la contraseña */}
             <TextField
               variant="outlined"
               margin="normal"
@@ -120,15 +126,18 @@ const SignIn = () => {
               autoComplete="current-password"
               onChange={handlePasswordChange}
             />
+            {/* Checkbox para recordar usuario */}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Recordarme"
             />
+            {/* Mensaje de error si las credenciales son incorrectas */}
             {error && (
               <Typography color="error" variant="body2">
                 {error}
               </Typography>
             )}
+            {/* Botón para enviar el formulario */}
             <Button
               fullWidth
               variant="contained"
@@ -138,6 +147,7 @@ const SignIn = () => {
             >
               Iniciar sesión
             </Button>
+            {/* Enlaces para recuperar contraseña o registrarse */}
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">

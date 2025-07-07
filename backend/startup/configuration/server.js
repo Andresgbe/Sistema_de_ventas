@@ -25,9 +25,6 @@ app.use(bodyParser.json());
 // --- RUTAS PARA CLIENTES ---
 app.use("/api/clientes", clientRoutes);
 
-
-// --- RUTAS PARA USUARIOS ---
-
 // Obtener todos los usuarios
 app.get('/api/users', async (req, res) => {
   try {

@@ -7,6 +7,7 @@ import Home from "../frontend/design/principal/Home.jsx";
 //import Providers from "./pages/Providers.jsx";
 import SalesPage from "../frontend/views/salefront/SalesPage.jsx";
 import ClientsPage from "../frontend/views/clientfront/ClientsPage.jsx"
+import ProvidersPage from "../frontend/views/providerfront/ProvidersPage.jsx";
 import ProductsPage from "../frontend/views/productfront/ProductsPage.jsx";
 import { AuthProvider, useAuth } from "../frontend/design/login/AuthContext.jsx";
 
@@ -60,7 +61,7 @@ const App = () => {
         {isAuthenticated ? <ProductsPage /> : <Redirect to="/" />}
       </Route>
       <Route path="/providers">
-        {/*isAuthenticated ? <Providers /> : <Redirect to="/" />*/}
+        {isAuthenticated ? <ProvidersPage /> : <Redirect to="/" />}
       </Route>
       <Route path="/sells">
         {isAuthenticated ? <SalesPage /> : <Redirect to="/" />}
