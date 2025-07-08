@@ -145,6 +145,17 @@ const SalesContainer = () => {
     }
   };
 
+  useEffect(() => {
+    if (precioProducto && cantidad) {
+      const totalCalculado = (
+        parseFloat(precioProducto) * parseFloat(cantidad)
+      ).toFixed(2);
+      setTotal(totalCalculado);
+    } else {
+      setTotal("");
+    }
+  }, [precioProducto, cantidad]);
+
   const handleCodigoProductoChange = async (e) => {
     const codigo = e.target.value;
     setCodigoProducto(codigo);
@@ -152,7 +163,7 @@ const SalesContainer = () => {
     if (codigo) {
       try {
         const product = await fetchProductByCode(codigo);
-        const precio = parseFloat(product.precio) || 0;
+        const precio = parseFloat(product.price) || 0; // ← CAMBIO AQUÍ
         setPrecioProducto(precio);
 
         if (cantidad) {
@@ -169,6 +180,7 @@ const SalesContainer = () => {
       setTotal("");
     }
   };
+  
 
   const handleCantidadChange = (e) => {
     const cant = e.target.value;
@@ -183,6 +195,17 @@ const SalesContainer = () => {
       setTotal("");
     }
   };
+
+  useEffect(() => {
+    if (precioProducto && cantidad) {
+      const totalCalculado = (
+        parseFloat(precioProducto) * parseFloat(cantidad)
+      ).toFixed(2);
+      setTotal(totalCalculado);
+    } else {
+      setTotal("");
+    }
+  }, [precioProducto, cantidad]);
 
   return (
     <Grid container spacing={2}>
@@ -327,3 +350,4 @@ const SalesContainer = () => {
 };
 
 export default SalesContainer;
+// This code defines a React component for managing sales, including creating, updating, and deleting sales records.

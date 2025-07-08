@@ -1,3 +1,4 @@
+// Importa express y las funciones del modelo de cliente
 import express from "express";
 import {
   getAllClients as getAll,
@@ -6,9 +7,12 @@ import {
   deleteClient as remove,
 } from "./clientModel.js";
 
-const router = express.Router();
+const router = express.Router(); // Inicializa el router de Express para definir las rutas
 
 // --- RUTAS ---
+
+// Ruta GET para obtener todos los clientes
+// Llama a la función getAll del modelo y responde con la lista de clientes
 router.get("/", async (req, res) => {
   try {
     const clients = await getAll();
@@ -18,6 +22,8 @@ router.get("/", async (req, res) => {
   }
 });
 
+// Ruta POST para crear un nuevo cliente
+// Llama a la función create del modelo y responde con el cliente creado
 router.post("/", async (req, res) => {
   try {
     const newClient = await create(req.body);
@@ -29,6 +35,8 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Ruta PUT para actualizar un cliente existente por su ID
+// Llama a la función update del modelo y responde con el cliente actualizado
 router.put("/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -39,6 +47,8 @@ router.put("/:id", async (req, res) => {
   }
 });
 
+// Ruta DELETE para eliminar un cliente por su ID
+// Llama a la función remove del modelo y responde con un mensaje de éxito o error
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   try {
@@ -50,3 +60,14 @@ router.delete("/:id", async (req, res) => {
 });
 
 export default router;
+
+/*
+----------------------------------------------------------
+Flujo general y uso del archivo:
+----------------------------------------------------------
+- Este archivo define el controlador de rutas para la entidad Cliente usando Express.
+- Expone rutas HTTP (GET, POST, PUT, DELETE) para gestionar clientes.
+- Cada ruta llama a una función del modelo clientModel.js para interactuar con la base de datos.
+- Se comunica directamente con el modelo (clientModel.js) y es utilizado por el archivo principal del servidor (server.js).
+- Se utiliza cuando el backend recibe peticiones HTTP relacionadas con clientes, ya sea desde el frontend o herramientas externas.
+*/
