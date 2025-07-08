@@ -17,7 +17,7 @@ export const createSale = async (saleData) => {
 
   const result = await pool.query(
     `INSERT INTO ventas 
-    (codigo_producto, cliente_id, descripcion, cantidad, total) 
+      (codigo_producto, cliente_id, descripcion, cantidad, total) 
      VALUES ($1, $2, $3, $4, $5) RETURNING *`,
     [
       sale.codigo_producto,
@@ -37,7 +37,7 @@ export const updateSale = async (id, saleData) => {
 
   const result = await pool.query(
     `UPDATE ventas 
-     SET codigo_producto = $1, cliente_id = $2, descripcion = $3, cantidad = $4, total = $5 
+       SET codigo_producto = $1, cliente_id = $2, descripcion = $3, cantidad = $4, total = $5 
      WHERE id = $6 RETURNING *`,
     [codigo_producto, cliente_id, descripcion, cantidad, total, id]
   );

@@ -1,50 +1,57 @@
-import pool from "../../startup/configuration/dbConfig.js";
-import Sale from "./sale.js";
+import express from "express";
+import {
+  getAllSales as getAll,
+  createSale as create,
+  updateSale as update,
+  deleteSale as remove,
+} from "./saleModel.js";
 
-export const getAllSales = async () => {
-  const result = await pool.query("SELECT * FROM ventas ORDER BY id ASC");
-  return result.rows;
-};
+const router = express.Router();
 
-export const createSale = async (saleData) => {
-  const sale = new Sale(
-    saleData.codigo_producto,
-    saleData.cliente_id,
-    saleData.descripcion,
-    saleData.cantidad,
-    saleData.total
-  );
+// GET /api/ventas
+router.get("/", async (req, res) => {
+  try {
+    const sales = await getAll();
+    res.json(sales);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error al obtener las ventas" });
+  }
+});
 
-  const result = await pool.query(
-    `INSERT INTO ventas 
-    (codigo_producto, cliente_id, descripcion, cantidad, total) 
-     VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-    [
-      sale.codigo_producto,
-      sale.cliente_id,
-      sale.descripcion,
-      sale.cantidad,
-      sale.total,
-    ]
-  );
+// POST /api/ventas
+router.post("/", async (req, res) => {
+  try {
+    const newSale = await create(req.body);
+    res.status(201).json(newSale);
+  } catch (err) {
+    console.error("❌ Error al crear venta:", err.message);
+    res.status(400).json({ error: err.message });
+  }
+});
 
-  return result.rows[0];
-};
+// PUT /api/ventas/:id
+router.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedSale = await update(id, req.body);
+    res.json(updatedSale);
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: "Error al actualizar la venta" });
+  }
+});
 
-export const updateSale = async (id, saleData) => {
-  const { codigo_producto, cliente_id, descripcion, cantidad, total } =
-    saleData;
+// DELETE /api/ventas/:id
+router.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    await remove(id);
+    res.json({ message: "Venta eliminada" });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
+  }
+});
 
-  const result = await pool.query(
-    `UPDATE ventas 
-     SET codigo_producto = $1, cliente_id = $2, descripcion = $3, cantidad = $4, total = $5 
-     WHERE id = $6 RETURNING *`,
-    [codigo_producto, cliente_id, descripcion, cantidad, total, id]
-  );
-
-  return result.rows[0];
-};
-
-export const deleteSale = async (id) => {
-  await pool.query(`DELETE FROM ventas WHERE id = $1`, [id]);
-};
+export default router;

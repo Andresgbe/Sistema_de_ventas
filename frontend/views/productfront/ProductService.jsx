@@ -44,3 +44,12 @@ export const deleteProduct = async (id) => {
 
   return data;
 };
+
+
+export const fetchProductByCode = async (codigo) => {
+  const response = await fetch(`${API_URL}/${codigo}`);
+  if (!response.ok) {
+    throw new Error("Error al obtener el producto");
+  }
+  return response.json();
+};

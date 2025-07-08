@@ -13,16 +13,26 @@ import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Swal from "sweetalert2";
+import { fetchClients } from "../clientfront/ClientService";
+import { fetchProductByCode } from "../productfront/ProductService";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
+import InputLabel from "@mui/material/InputLabel";
+import FormControl from "@mui/material/FormControl";
 
 const SalesContainer = () => {
   const [sales, setSales] = useState([]);
   const [editingSale, setEditingSale] = useState(null);
   const [showForm, setShowForm] = useState(false);
+
   const [codigoProducto, setCodigoProducto] = useState("");
   const [clienteId, setClienteId] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [cantidad, setCantidad] = useState("");
   const [total, setTotal] = useState("");
+  const [precioProducto, setPrecioProducto] = useState(0);
+
+  const [clients, setClients] = useState([]);
 
   const loadSales = async () => {
     try {
@@ -33,8 +43,18 @@ const SalesContainer = () => {
     }
   };
 
+  const loadClients = async () => {
+    try {
+      const data = await fetchClients();
+      setClients(data);
+    } catch (error) {
+      console.error("Error al obtener clientes:", error);
+    }
+  };
+
   useEffect(() => {
     loadSales();
+    loadClients();
   }, []);
 
   useEffect(() => {
@@ -55,6 +75,7 @@ const SalesContainer = () => {
     setDescripcion("");
     setCantidad("");
     setTotal("");
+    setPrecioProducto(0);
   };
 
   const handleCreateOrUpdate = async (e) => {
@@ -124,6 +145,45 @@ const SalesContainer = () => {
     }
   };
 
+  const handleCodigoProductoChange = async (e) => {
+    const codigo = e.target.value;
+    setCodigoProducto(codigo);
+
+    if (codigo) {
+      try {
+        const product = await fetchProductByCode(codigo);
+        const precio = parseFloat(product.precio) || 0;
+        setPrecioProducto(precio);
+
+        if (cantidad) {
+          const totalCalculado = (precio * parseFloat(cantidad)).toFixed(2);
+          setTotal(totalCalculado);
+        }
+      } catch (error) {
+        console.error("Error al buscar producto:", error);
+        setPrecioProducto(0);
+        setTotal("");
+      }
+    } else {
+      setPrecioProducto(0);
+      setTotal("");
+    }
+  };
+
+  const handleCantidadChange = (e) => {
+    const cant = e.target.value;
+    setCantidad(cant);
+
+    if (precioProducto && cant) {
+      const totalCalculado = (
+        parseFloat(precioProducto) * parseFloat(cant)
+      ).toFixed(2);
+      setTotal(totalCalculado);
+    } else {
+      setTotal("");
+    }
+  };
+
   return (
     <Grid container spacing={2}>
       <Grid item xs={12}>
@@ -151,17 +211,26 @@ const SalesContainer = () => {
                   <TextField
                     label="Código Producto"
                     value={codigoProducto}
-                    onChange={(e) => setCodigoProducto(e.target.value)}
+                    onChange={handleCodigoProductoChange}
                     fullWidth
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <TextField
-                    label="ID Cliente"
-                    value={clienteId}
-                    onChange={(e) => setClienteId(e.target.value)}
-                    fullWidth
-                  />
+                  <FormControl fullWidth>
+                    <InputLabel id="cliente-label">Cliente</InputLabel>
+                    <Select
+                      labelId="cliente-label"
+                      label="Cliente"
+                      value={clienteId}
+                      onChange={(e) => setClienteId(e.target.value)}
+                    >
+                      {clients.map((c) => (
+                        <MenuItem key={c.id} value={c.id}>
+                          {c.nombre}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <TextField
@@ -175,7 +244,7 @@ const SalesContainer = () => {
                   <TextField
                     label="Cantidad"
                     value={cantidad}
-                    onChange={(e) => setCantidad(e.target.value)}
+                    onChange={handleCantidadChange}
                     fullWidth
                   />
                 </Grid>
@@ -183,7 +252,7 @@ const SalesContainer = () => {
                   <TextField
                     label="Total"
                     value={total}
-                    onChange={(e) => setTotal(e.target.value)}
+                    InputProps={{ readOnly: true }}
                     fullWidth
                   />
                 </Grid>
@@ -214,7 +283,7 @@ const SalesContainer = () => {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell>Código Producto</TableCell>
-                <TableCell>ID Cliente</TableCell>
+                <TableCell>Cliente</TableCell>
                 <TableCell>Descripción</TableCell>
                 <TableCell>Cantidad</TableCell>
                 <TableCell>Total</TableCell>
@@ -226,7 +295,10 @@ const SalesContainer = () => {
                 <TableRow key={sale.id}>
                   <TableCell>{sale.id}</TableCell>
                   <TableCell>{sale.codigo_producto}</TableCell>
-                  <TableCell>{sale.cliente_id}</TableCell>
+                  <TableCell>
+                    {clients.find((c) => c.id === sale.cliente_id)?.nombre ||
+                      sale.cliente_id}
+                  </TableCell>
                   <TableCell>{sale.descripcion}</TableCell>
                   <TableCell>{sale.cantidad}</TableCell>
                   <TableCell>{sale.total}</TableCell>

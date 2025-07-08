@@ -39,3 +39,10 @@ export const updateProduct = async (id, productData) => {
 export const deleteProduct = async (id) => {
   await pool.query(`DELETE FROM productos WHERE id = $1`, [id]);
 };
+
+export const getProductByCode = async (code) => {
+  const result = await pool.query(`SELECT * FROM productos WHERE code = $1`, [
+    code,
+  ]);
+  return result.rows[0];
+};
